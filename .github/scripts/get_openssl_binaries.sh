@@ -1,7 +1,9 @@
 #!/bin/bash
 set -ex
 
-export OPENSSL_DIR=/usr/local/openssl
+if [ "$1" = "Cosmian/kms" || "$1" = "Cosmian/cli"]; then
+    export OPENSSL_DIR=/usr/local/openssl
+fi
 
 env
 
