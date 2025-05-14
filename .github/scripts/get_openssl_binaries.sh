@@ -1,10 +1,6 @@
 #!/bin/bash
 set -ex
 
-if [ "$1" = "Cosmian/kms" || "$1" = "Cosmian/cli"]; then
-    export OPENSSL_DIR=/usr/local/openssl
-fi
-
 env
 
 if [ -z "$OPENSSL_DIR" ]; then
@@ -13,7 +9,7 @@ if [ -z "$OPENSSL_DIR" ]; then
 fi
 
 if [ -z "$OS_NAME" ]; then
-    OS_NAME=ubuntu_22_04
+    OS_NAME=ubuntu_20_04
 else
     OS_NAME=${OS_NAME#fips_}
 fi
@@ -37,5 +33,5 @@ mv "${OPENSSL_VERSION}.tar.gz" "${OPENSSL_DIR}"
 echo -n Extracting compressed archive...
 cd "${OPENSSL_DIR}"
 tar -xf "$OPENSSL_VERSION.tar.gz"
-find .
+chmod u+x lib*/ossl-modules/*
 rm "$OPENSSL_VERSION.tar.gz"
