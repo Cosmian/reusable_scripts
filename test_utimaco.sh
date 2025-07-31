@@ -32,3 +32,5 @@ cd ./hsm-simulator/Administration
 ./p11tool2 Slot=0 LoginUser=11223344 SetPin=11223344,12345678
 ./p11tool2 Slot=0 GetSlotInfo
 cd ../..
+
+rm -rf hsm-simulator
