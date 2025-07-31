@@ -12,9 +12,7 @@ if [ -z "$OPENSSL_DIR" ]; then
     exit 1
 fi
 
-if [ -z "$OS_NAME" ]; then
-    OS_NAME=ubuntu_22_04
-elif [ "$OS_NAME" = "ui" ]; then
+if [ -z "$OS_NAME" || "$OS_NAME" == "ui" ]; then
     OS_NAME=ubuntu_22_04
 else
     OS_NAME=${OS_NAME#fips_}
