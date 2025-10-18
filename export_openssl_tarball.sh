@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 
-# Build OpenSSL 3.1.2 in the repo's nix-shell (glibc<=2.28) and export it as a tarball
-# that can be reused on other machines without rebuilding. The tarball layout matches
+# Build OpenSSL 3.1.2 via Nix and export it as a tarball that can be reused
+# on other machines without rebuilding. The tarball layout matches
 # OPENSSL_DIR expectations: include/, lib/, ssl/, bin/, lib/ossl-modules/.
 #
-# Output: artifacts/openssl-3.1.2-${OS}-${ARCH}-glibc2.27.tar.gz
+# Output:
+#   Linux:  artifacts/openssl-3.1.2-${OS}-${ARCH}-glibc2.27.tar.gz
+#   Darwin: artifacts/openssl-3.1.2-${OS}-${ARCH}-static-fips.tar.gz
 #
 # Usage:
 #   bash .github/reusable_scripts/export_openssl_tarball.sh
@@ -22,20 +24,82 @@ if ! command -v nix-build >/dev/null 2>&1; then
   exit 1
 fi
 
-# Pin nixpkgs to match shell.nix glibc (2.27) environment unless overridden
-NIXPKGS_PIN_URL=${NIXPKGS_PIN_URL:-https://github.com/NixOS/nixpkgs/archive/refs/heads/nixos-19.03.tar.gz}
-
+# Use current nixpkgs - the derivation will handle glibc compatibility
 OS=$(uname -s | tr '[:upper:]' '[:lower:]')
-ARCH=$(uname -m)
+HOST_ARCH=$(uname -m)
 
-# Build the OpenSSL derivation via a nix expression that imports the pinned nixpkgs
-EXPR="let pkgs = import (fetchTarball \"$NIXPKGS_PIN_URL\") {}; in with pkgs; callPackage \"$REPO_ROOT/nix/openssl-3_1_2-fips.nix\" {}"
+# Build the OpenSSL derivation using the same approach as shell.nix
+# On macOS ARM64, import nixpkgs for aarch64-darwin so we get a native toolchain
+if [ "$OS" = "darwin" ] && [ "$HOST_ARCH" = "arm64" ]; then
+  echo "Using aarch64-darwin nixpkgs for native ARM64 build..."
+  EXPR="let pkgs = import <nixpkgs> { system = \"aarch64-darwin\"; }; in pkgs.callPackage \"$REPO_ROOT/nix/openssl-3_1_2-fips.nix\" {}"
+else
+  EXPR="let pkgs = import <nixpkgs> {}; in pkgs.callPackage \"$REPO_ROOT/nix/openssl-3_1_2-fips.nix\" {}"
+fi
 
 STORE_PATH=$(nix-build -E "$EXPR" --no-out-link)
 echo "Built OpenSSL at: $STORE_PATH"
 
+# Detect the actual architecture of the built OpenSSL binary
+# This is more reliable than uname -m since Nix might cross-compile
+if [ "$OS" = "darwin" ]; then
+  # On macOS, use lipo to detect the actual architecture
+  if command -v lipo >/dev/null 2>&1 && [ -f "$STORE_PATH/lib/libcrypto.a" ]; then
+    DETECTED_ARCH=$(lipo -info "$STORE_PATH/lib/libcrypto.a" 2>/dev/null | sed -n 's/^Non-fat file: .* is architecture: //p')
+    if [ -n "$DETECTED_ARCH" ]; then
+      # Map architecture names to match naming convention
+      case "$DETECTED_ARCH" in
+      x86_64) ARCH="x86_64" ;;
+      arm64) ARCH="arm64" ;;
+      *) ARCH="$DETECTED_ARCH" ;;
+      esac
+    else
+      # Fallback to uname if lipo fails
+      ARCH=$(uname -m)
+    fi
+  else
+    ARCH=$(uname -m)
+  fi
+else
+  # On Linux, check the ELF architecture
+  if command -v file >/dev/null 2>&1 && [ -f "$STORE_PATH/lib/libcrypto.a" ]; then
+    # Extract the first object file from the archive to check its architecture
+    TEMP_DIR=$(mktemp -d)
+    trap 'rm -rf "$TEMP_DIR"' EXIT
+    cd "$TEMP_DIR"
+    ar x "$STORE_PATH/lib/libcrypto.a" 2>/dev/null || true
+    FIRST_OBJ=$(find . -name "*.o" | head -1)
+    if [ -n "$FIRST_OBJ" ]; then
+      FILE_OUTPUT=$(file "$FIRST_OBJ")
+      if echo "$FILE_OUTPUT" | grep -q "x86-64"; then
+        ARCH="x86_64"
+      elif echo "$FILE_OUTPUT" | grep -q "aarch64"; then
+        ARCH="aarch64"
+      else
+        # Fallback to uname if file detection fails
+        ARCH=$(uname -m)
+      fi
+    else
+      ARCH=$(uname -m)
+    fi
+    cd "$REPO_ROOT"
+  else
+    ARCH=$(uname -m)
+  fi
+fi
+
+echo "Detected OpenSSL architecture: $ARCH"
+
 mkdir -p "$REPO_ROOT/artifacts"
-TARBALL="$REPO_ROOT/artifacts/openssl-3.1.2-${OS}-${ARCH}-glibc2.27.tar.gz"
+
+# Use platform-appropriate naming convention
+if [ "$OS" = "linux" ]; then
+  # For Linux, use glibc2.27 naming to match existing package server convention
+  TARBALL="$REPO_ROOT/artifacts/openssl-3.1.2-${OS}-${ARCH}-glibc2.27.tar.gz"
+else
+  # For other platforms (darwin), use static-fips naming
+  TARBALL="$REPO_ROOT/artifacts/openssl-3.1.2-${OS}-${ARCH}-static-fips.tar.gz"
+fi
 
 # Pack the output tree as-is to preserve layout expected by OPENSSL_DIR
 tar -C "$STORE_PATH" -czf "$TARBALL" .
