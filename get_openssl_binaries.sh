@@ -8,6 +8,10 @@ if [ -z "$OPENSSL_DIR" ]; then
     exit 1
 fi
 
+# If uname is arm64, then OS_NAME should be macos_arm
+if [[ "$(uname)" == "Darwin" && "$(uname -m)" == "arm64" ]]; then
+    OS_NAME="macos_arm"
+fi
 if [[ -z "$OS_NAME" || "$OS_NAME" == "ui" ]]; then
     OS_NAME=ubuntu_22_04
 else
