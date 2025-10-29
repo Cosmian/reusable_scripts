@@ -4,8 +4,24 @@ set -ex
 # sudo dpkg --add-architecture i386
 # sudo apt-get update && sudo apt-get install libc6:i386 libstdc++6:i386
 
-# Use curl instead of wget (more likely to be available in nix environment)
-curl -L -o hsm-simulator.tar.xz "https://package.cosmian.com/ci/hsm-simulator.tar.xz"
+# Use Python urllib with proper SSL context for certificate verification
+# Install certifi if needed for CA certificates, then download
+python3 -m pip install --quiet certifi 2>/dev/null || true
+python3 -c "
+import urllib.request
+import ssl
+try:
+    import certifi
+    ctx = ssl.create_default_context(cafile=certifi.where())
+except ImportError:
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = True
+    ctx.verify_mode = ssl.CERT_REQUIRED
+
+opener = urllib.request.build_opener(urllib.request.HTTPSHandler(context=ctx))
+urllib.request.install_opener(opener)
+urllib.request.urlretrieve('https://package.cosmian.com/ci/hsm-simulator.tar.xz', 'hsm-simulator.tar.xz')
+"
 killall -9 bl_sim5 || true
 echo -n Extracting compressed archive...
 tar -xf hsm-simulator.tar.xz
