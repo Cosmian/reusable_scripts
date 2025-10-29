@@ -4,7 +4,8 @@ set -ex
 # sudo dpkg --add-architecture i386
 # sudo apt-get update && sudo apt-get install libc6:i386 libstdc++6:i386
 
-wget "https://package.cosmian.com/ci/hsm-simulator.tar.xz"
+# Use curl instead of wget (more likely to be available in nix environment)
+curl -L -o hsm-simulator.tar.xz "https://package.cosmian.com/ci/hsm-simulator.tar.xz"
 killall -9 bl_sim5 || true
 echo -n Extracting compressed archive...
 tar -xf hsm-simulator.tar.xz
