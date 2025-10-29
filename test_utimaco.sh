@@ -4,14 +4,8 @@ set -ex
 # sudo dpkg --add-architecture i386
 # sudo apt-get update && sudo apt-get install libc6:i386 libstdc++6:i386
 
-# Download HSM simulator using wget (installed on-demand via nix)
-if command -v nix-shell &>/dev/null; then
-  # Use nix-shell to provide wget temporarily
-  nix-shell -p wget --run "wget -q https://package.cosmian.com/ci/hsm-simulator.tar.xz"
-else
-  # Fallback to wget if nix is not available (CI environments)
-  wget -q https://package.cosmian.com/ci/hsm-simulator.tar.xz
-fi
+# Fallback to wget if nix is not available (CI environments)
+wget -q https://package.cosmian.com/ci/hsm-simulator.tar.xz
 
 killall -9 bl_sim5 || true
 echo -n Extracting compressed archive...
