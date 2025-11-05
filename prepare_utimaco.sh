@@ -5,12 +5,12 @@ set -ex
 # sudo apt-get update && sudo apt-get install libc6:i386 libstdc++6:i386
 
 # Fallback to wget if nix is not available (CI environments)
-wget -q https://package.cosmian.com/ci/hsm-simulator.tar.xz
+wget -q https://package.cosmian.com/ci/hsm-utimaco-simulator.tar.xz
 
 killall -9 bl_sim5 || true
 echo -n Extracting compressed archive...
-tar -xf hsm-simulator.tar.xz
-rm hsm-simulator.tar.xz
+tar -xf hsm-utimaco-simulator.tar.xz
+rm hsm-utimaco-simulator.tar.xz
 ./hsm-simulator/sim5_linux/bin/bl_sim5 -h -o -d ./hsm-simulator/sim5_linux/devices &
 
 sleep 5
