@@ -1,9 +1,6 @@
 #!/bin/bash
 set -ex
 
-# sudo dpkg --add-architecture i386
-# sudo apt-get update && sudo apt-get install libc6:i386 libstdc++6:i386
-
 # Fallback to wget if nix is not available (CI environments)
 wget -q https://package.cosmian.com/ci/hsm-utimaco-simulator.tar.xz
 
