@@ -12,4 +12,6 @@ sudo cp proteccio/usr/local/bin/* /usr/local/bin/
 
 rm -rf proteccio
 
-/usr/local/bin/nethsmstatus
+# Check HSM connectivity (non-fatal - tests will fail later if HSM is unreachable)
+# Temporarily clear Nix OpenSSL environment to use system libraries for Proteccio
+env -u LD_PRELOAD -u LD_LIBRARY_PATH -u OPENSSL_CONF -u OPENSSL_MODULES /usr/local/bin/nethsmstatus
