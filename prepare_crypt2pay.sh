@@ -6,7 +6,7 @@ tar -xzf hsm-crypt2pay.tar.gz
 rm hsm-crypt2pay.tar.gz
 
 sudo mkdir -p /etc/c2p/
-sudo cp -R c2p/etc/* /etc/
+sudo cp -R c2p/etc/c2p/* /etc/c2p/
 sudo cp c2p/lib/* /lib/
 
 rm -rf c2p
