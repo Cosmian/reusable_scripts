@@ -6,11 +6,11 @@ tar -xzf hsm-proteccio.tar.gz
 rm hsm-proteccio.tar.gz
 
 sudo mkdir -p /etc/proteccio/
-sudo cp proteccio/etc/proteccio/* /etc/proteccio/
-sudo cp proteccio/lib/* /lib/
-sudo cp proteccio/usr/local/bin/* /usr/local/bin/
+sudo cp hsm-proteccio/proteccio/etc/proteccio/* /etc/proteccio/
+sudo cp hsm-proteccio/proteccio/lib/* /lib/
+sudo cp hsm-proteccio/proteccio/usr/local/bin/* /usr/local/bin/
 
-rm -rf proteccio
+rm -rf hsm-proteccio
 
 # Check HSM connectivity (non-fatal - tests will fail later if HSM is unreachable)
 # Temporarily clear Nix OpenSSL environment to use system libraries for Proteccio
