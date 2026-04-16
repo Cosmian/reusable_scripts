@@ -30,4 +30,6 @@ sudo sed -i "s|<TraceLevel>.*</TraceLevel>|<TraceLevel>debug functions parameter
 sudo sed -i "s|<TraceFile>.*</TraceFile>|<TraceFile>+/etc/c2p/logs/c2p.trc</TraceFile>|" c2p.xml
 
 # Test HSM
-sudo ./p11tool -shared libpkcs11c2p.so -genkey -keyalg des2 -alias MyTestKey -usage 'sw'
+sudo ./p11tool -shared libpkcs11c2p.so -list
+
+cd -
