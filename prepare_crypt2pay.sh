@@ -29,6 +29,10 @@ sudo ./installca -l ./ssl/
 sudo sed -i "s|<TraceLevel>.*</TraceLevel>|<TraceLevel>debug functions parameters pkcs hsm</TraceLevel>|" c2p.xml
 sudo sed -i "s|<TraceFile>.*</TraceFile>|<TraceFile>+/etc/c2p/logs/c2p.trc</TraceFile>|" c2p.xml
 
+# Diagnostic: check p11tool version and library presence
+./p11tool -version 2>/dev/null || ./p11tool --version 2>/dev/null || true
+ls -la libpkcs11c2p.so
+
 # Test HSM
 sudo ./p11tool -shared libpkcs11c2p.so -genkey -usage w -keyalg aes -keysize 256
 
