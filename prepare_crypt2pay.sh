@@ -34,6 +34,6 @@ sudo sed -i "s|<TraceFile>.*</TraceFile>|<TraceFile>+/etc/c2p/logs/c2p.trc</Trac
 ls -la libpkcs11c2p.so
 
 # Test HSM
-sudo ./p11tool -shared libpkcs11c2p.so -genkey -usage w -keyalg aes -keysize 256
+sudo ./p11tool -shared /usr/lib/libpkcs11c2p.so -genkey -usage w -keyalg aes -keysize 256
 
 cd -
