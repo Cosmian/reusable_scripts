@@ -19,12 +19,10 @@ sudo chmod -R 755 /etc/c2p
 sudo mkdir -p /etc/c2p/logs
 sudo chmod 777 /etc/c2p/logs
 
-cd /etc/c2p/
-
 # install CA
-sudo ./installca -i ./ca.der ssl
-sudo ./installca -l ./ssl/
+sudo /etc/c2p/installca -i /etc/c2p/ca.der ssl
+sudo /etc/c2p/installca -l /etc/c2p/ssl/
 
 # Logging config
-sudo sed -i "s|<TraceLevel>.*</TraceLevel>|<TraceLevel>debug functions parameters pkcs hsm</TraceLevel>|" c2p.xml
-sudo sed -i "s|<TraceFile>.*</TraceFile>|<TraceFile>+/etc/c2p/logs/c2p.trc</TraceFile>|" c2p.xml
+sudo sed -i "s|<TraceLevel>.*</TraceLevel>|<TraceLevel>debug functions parameters pkcs hsm</TraceLevel>|" /etc/c2p/c2p.xml
+sudo sed -i "s|<TraceFile>.*</TraceFile>|<TraceFile>+/etc/c2p/logs/c2p.trc</TraceFile>|" /etc/c2p/c2p.xml
