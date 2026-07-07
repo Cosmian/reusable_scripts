@@ -7,9 +7,9 @@ CRYPT2PAY_OPENVPN_PID_FILE="${CRYPT2PAY_OPENVPN_PID_FILE:-/tmp/crypt2pay-openvpn
 CRYPT2PAY_OPENVPN_CONF_FILE="${CRYPT2PAY_OPENVPN_CONF_FILE:-/tmp/crypt2pay-openvpn.conf}"
 
 if [[ -n "${OVPN_CONF:-}" ]] && ! timeout 5 openssl s_client -connect "${CRYPT2PAY_HOST}:${CRYPT2PAY_PORT}" </dev/null >/dev/null 2>&1; then
-  command -v openvpn >/dev/null
+  OPENVPN_BIN="$(command -v openvpn)"
   printf "%s\n" "$OVPN_CONF" > "$CRYPT2PAY_OPENVPN_CONF_FILE"
-  sudo openvpn --config "$CRYPT2PAY_OPENVPN_CONF_FILE" --daemon --writepid "$CRYPT2PAY_OPENVPN_PID_FILE"
+  sudo "$OPENVPN_BIN" --config "$CRYPT2PAY_OPENVPN_CONF_FILE" --daemon --writepid "$CRYPT2PAY_OPENVPN_PID_FILE"
 fi
 
 wget -q https://package.cosmian.com/ci/hsm-crypt2pay.tar.gz
