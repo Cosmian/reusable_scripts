@@ -1,6 +1,17 @@
 #!/bin/bash
 set -ex
 
+CRYPT2PAY_HOST="${CRYPT2PAY_HOST:-193.251.15.196}"
+CRYPT2PAY_PORT="${CRYPT2PAY_PORT:-3001}"
+CRYPT2PAY_OPENVPN_PID_FILE="${CRYPT2PAY_OPENVPN_PID_FILE:-/tmp/crypt2pay-openvpn.pid}"
+CRYPT2PAY_OPENVPN_CONF_FILE="${CRYPT2PAY_OPENVPN_CONF_FILE:-/tmp/crypt2pay-openvpn.conf}"
+
+if [[ -n "${OVPN_CONF:-}" ]] && ! timeout 5 openssl s_client -connect "${CRYPT2PAY_HOST}:${CRYPT2PAY_PORT}" </dev/null >/dev/null 2>&1; then
+  OPENVPN_BIN="$(command -v openvpn)"
+  printf "%s\n" "$OVPN_CONF" > "$CRYPT2PAY_OPENVPN_CONF_FILE"
+  sudo "$OPENVPN_BIN" --config "$CRYPT2PAY_OPENVPN_CONF_FILE" --daemon --writepid "$CRYPT2PAY_OPENVPN_PID_FILE"
+fi
+
 wget -q https://package.cosmian.com/ci/hsm-crypt2pay.tar.gz
 tar -xzf hsm-crypt2pay.tar.gz
 rm hsm-crypt2pay.tar.gz
@@ -77,11 +88,11 @@ sudo ./installca -i /tmp/bridge_ca.der ssl/authorities
 # The C2P SSL code looks up CAs under <dgst>/<cert_hash>/cert.ca where <dgst>
 # is computed from the server certificate.  We need to connect to the HSM to
 # obtain the server cert and compute the dgst.  Instead, we pre-compute it:
-# the HSM at 193.251.15.196:3001 presents cert with dgst jVbkUrN2gem9gcItyD8SX3z-rk1
+# the HSM at ${CRYPT2PAY_HOST}:${CRYPT2PAY_PORT} presents cert with dgst jVbkUrN2gem9gcItyD8SX3z-rk1
 DGST="jVbkUrN2gem9gcItyD8SX3z-rk1"
 # Retrieve the actual dgst by connecting to the HSM (falls back to the
 # pre-computed value if the HSM is not yet reachable at this stage).
-if timeout 5 openssl s_client -connect 193.251.15.196:3001 </dev/null 2>/dev/null \
+if timeout 5 openssl s_client -connect "${CRYPT2PAY_HOST}:${CRYPT2PAY_PORT}" </dev/null 2>/dev/null \
      | openssl x509 -outform DER -out /tmp/hsm_server.der 2>/dev/null; then
   # installca -t prints the expected CA lookup path
   COMPUTED_DGST=$(sudo ./installca -t /tmp/hsm_server.der ssl/authorities 2>&1 \
@@ -109,8 +120,10 @@ rm -f /tmp/bridge_key.pem /tmp/bridge.csr /tmp/bridge_ext.cnf \
 
 cd -
 
-# Fix C2P port: the HSM SSL service runs on port 3001 (port 3002 is firewalled)
-sudo sed -i "s|<Port>3002</Port>|<Port>3001</Port>|" /etc/c2p/c2p.xml
+# Fix C2P target: packaged config defaults to port 3002, but test endpoint can
+# be reached through VPN or another forwarded address.
+sudo sed -i "s|<IP>.*</IP>|<IP>${CRYPT2PAY_HOST}</IP>|" /etc/c2p/c2p.xml
+sudo sed -i "s|<Port>.*</Port>|<Port>${CRYPT2PAY_PORT}</Port>|" /etc/c2p/c2p.xml
 
 # Logging config
 sudo sed -i "s|<TraceLevel>.*</TraceLevel>|<TraceLevel>debug functions parameters pkcs hsm</TraceLevel>|" /etc/c2p/c2p.xml
