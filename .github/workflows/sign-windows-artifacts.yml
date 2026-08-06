@@ -31,6 +31,11 @@ on:
         description: Azure Trusted Signing certificate profile name
         required: true
         type: string
+      artifact-to-download:
+        description: Name of a GitHub Actions artifact to download before signing (leave empty to skip)
+        required: false
+        type: string
+        default: ""
     secrets:
       AZURE_TENANT_ID:
         required: true
@@ -44,6 +49,13 @@ jobs:
     name: Sign with Azure Trusted Signing
     runs-on: windows-latest
     steps:
+      - name: Download artifact to sign
+        if: inputs.artifact-to-download != ''
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact-to-download }}
+          path: ${{ inputs.files-folder }}
+
       - name: Sign files
         uses: azure/artifact-signing-action@v2
         with:

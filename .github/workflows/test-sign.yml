@@ -1,0 +1,40 @@
+name: Test - Azure Trusted Signing
+
+on:
+  workflow_dispatch:
+
+jobs:
+  prepare:
+    name: Build test binary
+    runs-on: windows-latest
+    steps:
+      - name: Create dummy EXE for signing
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path to-sign
+          # Minimal valid PE header so Azure Trusted Signing accepts it
+          $bytes = [System.IO.File]::ReadAllBytes("C:\Windows\System32\cmd.exe")
+          [System.IO.File]::WriteAllBytes("to-sign\test.exe", $bytes)
+          Write-Host "Prepared to-sign\test.exe ($($bytes.Length) bytes)"
+
+      - name: Upload test binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-binary
+          path: to-sign/
+          if-no-files-found: error
+
+  sign:
+    needs: prepare
+    uses: ./.github/workflows/sign-windows-artifacts.yml
+    with:
+      artifact-to-download: test-binary
+      files-folder: to-sign
+      files-folder-filter: exe
+      signing-account-name: cosmian-codesigning-test
+      certificate-profile-name: cosmian-test-profile
+      artifact-name: test-signed
+    secrets:
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID_POC }}
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID_POC }}
+      AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET_POC }}
