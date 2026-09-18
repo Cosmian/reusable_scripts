@@ -92,6 +92,45 @@ install_aws_cloudhsm_pkcs11_client() {
   esac
 }
 
+CLOUDHSM_OPENVPN_PID_FILE="${CLOUDHSM_OPENVPN_PID_FILE:-/tmp/cloudhsm-openvpn.pid}"
+CLOUDHSM_OPENVPN_CONF_FILE="${CLOUDHSM_OPENVPN_CONF_FILE:-/tmp/cloudhsm-openvpn.conf}"
+
+# GitHub-hosted runners have no network path to the HSM's private VPC IP. When
+# direct TCP reachability fails and an AWS Client VPN profile is provided, start
+# it so the PKCS#11 client's TLS connection to the HSM ENI has a route to follow.
+# See crate/hsm/aws_cloudhsm/README.md for why this is needed (no public IP on
+# the HSM, unlike Crypt2Pay/Proteccio).
+maybe_start_cloudhsm_vpn() {
+  if [ -z "${AWS_CLOUDHSM_HSM_IPS:-}" ]; then
+    return 0
+  fi
+  local first_ip="${AWS_CLOUDHSM_HSM_IPS%% *}"
+
+  if timeout 5 bash -c "echo >/dev/tcp/${first_ip}/2223" 2>/dev/null; then
+    return 0
+  fi
+
+  if [ -z "${AWS_CLOUDHSM_OVPN_CONF:-}" ]; then
+    echo "ERROR: HSM ${first_ip}:2223 is not reachable and AWS_CLOUDHSM_OVPN_CONF is not set" >&2
+    exit 1
+  fi
+
+  require_command openvpn
+  require_command sudo
+  printf '%s\n' "${AWS_CLOUDHSM_OVPN_CONF}" >"${CLOUDHSM_OPENVPN_CONF_FILE}"
+  sudo openvpn --config "${CLOUDHSM_OPENVPN_CONF_FILE}" --daemon --writepid "${CLOUDHSM_OPENVPN_PID_FILE}"
+
+  for _ in $(seq 1 30); do
+    if timeout 5 bash -c "echo >/dev/tcp/${first_ip}/2223" 2>/dev/null; then
+      return 0
+    fi
+    sleep 1
+  done
+
+  echo "ERROR: HSM ${first_ip}:2223 still unreachable after starting the Client VPN tunnel" >&2
+  exit 1
+}
+
 configure_aws_cloudhsm_pkcs11() {
   require_command sudo
 
@@ -137,6 +176,7 @@ configure_aws_cloudhsm_pkcs11() {
 
 install_aws_cloudhsm_pkcs11_client
 write_aws_cloudhsm_ca_certificate
+maybe_start_cloudhsm_vpn
 configure_aws_cloudhsm_pkcs11
 
 export AWS_CLOUDHSM_PKCS11_LIB
