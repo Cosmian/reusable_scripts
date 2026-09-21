@@ -94,6 +94,7 @@ install_aws_cloudhsm_pkcs11_client() {
 
 CLOUDHSM_OPENVPN_PID_FILE="${CLOUDHSM_OPENVPN_PID_FILE:-/tmp/cloudhsm-openvpn.pid}"
 CLOUDHSM_OPENVPN_CONF_FILE="${CLOUDHSM_OPENVPN_CONF_FILE:-/tmp/cloudhsm-openvpn.conf}"
+CLOUDHSM_OPENVPN_LOG_FILE="${CLOUDHSM_OPENVPN_LOG_FILE:-/tmp/cloudhsm-openvpn.log}"
 
 # GitHub-hosted runners have no network path to the HSM's private VPC IP. When
 # direct TCP reachability fails and an AWS Client VPN profile is provided, start
@@ -122,7 +123,8 @@ maybe_start_cloudhsm_vpn() {
   local openvpn_bin
   openvpn_bin="$(command -v openvpn)"
   printf '%s\n' "${AWS_CLOUDHSM_OVPN_CONF}" >"${CLOUDHSM_OPENVPN_CONF_FILE}"
-  sudo "${openvpn_bin}" --config "${CLOUDHSM_OPENVPN_CONF_FILE}" --daemon --writepid "${CLOUDHSM_OPENVPN_PID_FILE}"
+  sudo "${openvpn_bin}" --config "${CLOUDHSM_OPENVPN_CONF_FILE}" --daemon --writepid "${CLOUDHSM_OPENVPN_PID_FILE}" \
+    --log "${CLOUDHSM_OPENVPN_LOG_FILE}"
 
   for _ in $(seq 1 30); do
     if timeout 5 bash -c "echo >/dev/tcp/${first_ip}/2223" 2>/dev/null; then
@@ -132,6 +134,10 @@ maybe_start_cloudhsm_vpn() {
   done
 
   echo "ERROR: HSM ${first_ip}:2223 still unreachable after starting the Client VPN tunnel" >&2
+  if [ -r "${CLOUDHSM_OPENVPN_LOG_FILE}" ]; then
+    echo "--- openvpn log (${CLOUDHSM_OPENVPN_LOG_FILE}) ---" >&2
+    sudo cat "${CLOUDHSM_OPENVPN_LOG_FILE}" >&2
+  fi
   exit 1
 }
 
