@@ -117,8 +117,12 @@ maybe_start_cloudhsm_vpn() {
 
   require_command openvpn
   require_command sudo
+  # sudo's secure_path ignores the Nix shell's PATH, so resolve the absolute
+  # path to the Nix-provided openvpn binary before invoking it as root.
+  local openvpn_bin
+  openvpn_bin="$(command -v openvpn)"
   printf '%s\n' "${AWS_CLOUDHSM_OVPN_CONF}" >"${CLOUDHSM_OPENVPN_CONF_FILE}"
-  sudo openvpn --config "${CLOUDHSM_OPENVPN_CONF_FILE}" --daemon --writepid "${CLOUDHSM_OPENVPN_PID_FILE}"
+  sudo "${openvpn_bin}" --config "${CLOUDHSM_OPENVPN_CONF_FILE}" --daemon --writepid "${CLOUDHSM_OPENVPN_PID_FILE}"
 
   for _ in $(seq 1 30); do
     if timeout 5 bash -c "echo >/dev/tcp/${first_ip}/2223" 2>/dev/null; then
