@@ -95,6 +95,7 @@ install_aws_cloudhsm_pkcs11_client() {
 CLOUDHSM_OPENVPN_PID_FILE="${CLOUDHSM_OPENVPN_PID_FILE:-/tmp/cloudhsm-openvpn.pid}"
 CLOUDHSM_OPENVPN_CONF_FILE="${CLOUDHSM_OPENVPN_CONF_FILE:-/tmp/cloudhsm-openvpn.conf}"
 CLOUDHSM_OPENVPN_LOG_FILE="${CLOUDHSM_OPENVPN_LOG_FILE:-/tmp/cloudhsm-openvpn.log}"
+CLOUDHSM_TCPDUMP_PCAP_FILE="${CLOUDHSM_TCPDUMP_PCAP_FILE:-/tmp/cloudhsm-tcpdump.pcap}"
 
 # GitHub-hosted runners have no network path to the HSM's private VPC IP. When
 # direct TCP reachability fails and an AWS Client VPN profile is provided, start
@@ -126,6 +127,15 @@ maybe_start_cloudhsm_vpn() {
   sudo "${openvpn_bin}" --config "${CLOUDHSM_OPENVPN_CONF_FILE}" --daemon --writepid "${CLOUDHSM_OPENVPN_PID_FILE}" \
     --log "${CLOUDHSM_OPENVPN_LOG_FILE}"
 
+  # AWS-side config (auth rules, VPN route, security groups, NACLs) has been
+  # verified correct, yet the port stays unreachable after a clean OpenVPN
+  # handshake. Capture the actual packets on the wire so the next failure
+  # shows whether the SYN even leaves via tun0 and whether anything comes back.
+  if command -v tcpdump >/dev/null 2>&1; then
+    rm -f "${CLOUDHSM_TCPDUMP_PCAP_FILE}"
+    sudo tcpdump -i any -w "${CLOUDHSM_TCPDUMP_PCAP_FILE}" "host ${first_ip}" >/tmp/cloudhsm-tcpdump.out 2>&1 &
+  fi
+
   for _ in $(seq 1 30); do
     if timeout 5 bash -c "echo >/dev/tcp/${first_ip}/2223" 2>/dev/null; then
       return 0
@@ -147,6 +157,15 @@ maybe_start_cloudhsm_vpn() {
   ip addr show tun0 >&2 2>&1 || echo "(tun0 not found)" >&2
   echo "--- ip route show table all ---" >&2
   ip route show table all >&2 2>&1 || echo "(ip route show failed)" >&2
+  # Give tcpdump a moment to flush its capture buffer, then stop it and print
+  # a packet-level summary: if the SYN toward the HSM never appears, the issue
+  # is upstream of the wire (kernel routing/NAT); if it appears with no
+  # SYN-ACK, the issue is on the AWS/HSM side despite the SG/NACL/route audit.
+  sleep 1
+  sudo pkill -f "tcpdump -i any -w ${CLOUDHSM_TCPDUMP_PCAP_FILE}" 2>/dev/null || true
+  sleep 1
+  echo "--- tcpdump summary (host ${first_ip}) ---" >&2
+  sudo tcpdump -nr "${CLOUDHSM_TCPDUMP_PCAP_FILE}" >&2 2>&1 || echo "(no tcpdump capture found at ${CLOUDHSM_TCPDUMP_PCAP_FILE})" >&2
   exit 1
 }
 
