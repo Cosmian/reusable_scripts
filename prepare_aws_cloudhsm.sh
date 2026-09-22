@@ -139,6 +139,14 @@ maybe_start_cloudhsm_vpn() {
   # even when the file has content. Read it through `sudo` unconditionally instead.
   echo "--- openvpn log (${CLOUDHSM_OPENVPN_LOG_FILE}) ---" >&2
   sudo cat "${CLOUDHSM_OPENVPN_LOG_FILE}" >&2 || echo "(no openvpn log found at ${CLOUDHSM_OPENVPN_LOG_FILE})" >&2
+  # A prior run showed a clean OpenVPN handshake (route pushed, tun0 up) yet the
+  # HSM port still unreachable, with the kernel route log line showing
+  # 'dev [NULL]' instead of 'dev tun0' — dump the actual kernel-level state to
+  # tell a route-binding problem apart from an OpenVPN-level one.
+  echo "--- ip addr show tun0 ---" >&2
+  ip addr show tun0 >&2 2>&1 || echo "(tun0 not found)" >&2
+  echo "--- ip route show table all ---" >&2
+  ip route show table all >&2 2>&1 || echo "(ip route show failed)" >&2
   exit 1
 }
 
