@@ -134,10 +134,11 @@ maybe_start_cloudhsm_vpn() {
   done
 
   echo "ERROR: HSM ${first_ip}:2223 still unreachable after starting the Client VPN tunnel" >&2
-  if [ -r "${CLOUDHSM_OPENVPN_LOG_FILE}" ]; then
-    echo "--- openvpn log (${CLOUDHSM_OPENVPN_LOG_FILE}) ---" >&2
-    sudo cat "${CLOUDHSM_OPENVPN_LOG_FILE}" >&2
-  fi
+  # The log is root-owned (written by the daemonized `sudo openvpn` process), so
+  # a plain `-r`/`-s` test as the invoking non-root user silently reports false
+  # even when the file has content. Read it through `sudo` unconditionally instead.
+  echo "--- openvpn log (${CLOUDHSM_OPENVPN_LOG_FILE}) ---" >&2
+  sudo cat "${CLOUDHSM_OPENVPN_LOG_FILE}" >&2 || echo "(no openvpn log found at ${CLOUDHSM_OPENVPN_LOG_FILE})" >&2
   exit 1
 }
 
