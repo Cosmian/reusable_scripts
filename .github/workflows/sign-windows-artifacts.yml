@@ -1,0 +1,80 @@
+---
+name: Sign Windows Artifacts (Azure Trusted Signing)
+
+on:
+  workflow_call:
+    inputs:
+      files-folder:
+        description: Path to the folder containing files to sign (relative to workspace root)
+        required: true
+        type: string
+      files-folder-filter:
+        description: Comma-separated list of file extensions to sign
+        required: false
+        type: string
+        default: exe
+      artifact-name:
+        description: Name for the uploaded signed artifact (leave empty to skip upload)
+        required: false
+        type: string
+        default: ""
+      endpoint:
+        description: Azure Trusted Signing endpoint URL
+        required: false
+        type: string
+        default: https://weu.codesigning.azure.net/
+      signing-account-name:
+        description: Azure Trusted Signing account name
+        required: true
+        type: string
+      certificate-profile-name:
+        description: Azure Trusted Signing certificate profile name
+        required: true
+        type: string
+      artifact-to-download:
+        description: Name of a GitHub Actions artifact to download before signing (leave empty to skip)
+        required: false
+        type: string
+        default: ""
+    secrets:
+      AZURE_TENANT_ID:
+        required: true
+      AZURE_CLIENT_ID:
+        required: true
+      AZURE_CLIENT_SECRET:
+        required: true
+
+jobs:
+  sign:
+    name: Sign with Azure Trusted Signing
+    runs-on: windows-latest
+    steps:
+      - name: Download artifact to sign
+        if: inputs.artifact-to-download != ''
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact-to-download }}
+          path: ${{ inputs.files-folder }}
+
+      - name: Sign files
+        uses: azure/artifact-signing-action@v2
+        with:
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure-client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+          endpoint: ${{ inputs.endpoint }}
+          signing-account-name: ${{ inputs.signing-account-name }}
+          certificate-profile-name: ${{ inputs.certificate-profile-name }}
+          files-folder: ${{ inputs.files-folder }}
+          files-folder-filter: ${{ inputs.files-folder-filter }}
+          file-digest: SHA256
+          timestamp-rfc3161: http://timestamp.acs.microsoft.com
+          timestamp-digest: SHA256
+
+      - name: Upload signed artifacts
+        if: inputs.artifact-name != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: ${{ inputs.files-folder }}
+          if-no-files-found: error
