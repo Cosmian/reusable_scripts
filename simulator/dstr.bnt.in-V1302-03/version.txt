@@ -1,0 +1,1540 @@
+  #########################
+  # dstr.bnt.in-V1302-03I #
+  #########################
+
+Création : Sep 8 2026, 13:20:56
+Révision : 9893a4762c06db256d765e08f79edb1ef955b43b
+
+Évolutions
+----------
+RM#8842 Usage U_conf et U_clear sur les clés KME et KTK
+RM#8833 Les clés IMKcpin et IMKlc peuvent etre de classe AES
+RM#8829 Import/export de ZMK/ZBPK en TR31/TR34
+RM#8828 Import/export des clés IMKtvv au format TR31
+RM#8826 Classe des clés HMAC importées en TR31
+RM#8817 Dérivation des clés Bancontact AES
+RM#8816 Import/export des clés KDE sous KTK
+RM#8809 Clés KTOG de classe HMAC
+RM#8737 Controle de la longueur du PIN en transchiffrement autorisé avec l'option PIN_G
+
+Corrections
+-----------
+RM#8852 Troncature de la clé chiffrée TR31 pour les clés RSA/ECC
+RM#8850 Alerte sur la longueur d'un élément CRT alors que la signature TLS s'est effectuée correctement
+RM#8795 Limitation du nombre de caractères dans le champ Utilisateur de l'agent SNMP sécurisé
+
+
+  #########################
+  # dstr.bnt.in-V1302-02I #
+  #########################
+
+Création : Jun 18 2026, 13:21:46
+Révision : f7567392e83fc7718a0d143c46339086c6e9a09f
+
+Évolutions
+----------
+RM#8789 Choix des attributs du header TR31 produit par la commande d'export sous clés ECC (FF832B)
+RM#8787 Suppression de Bull dans l'IHM d'administration
+RM#8774 Impression des composantes de clés sous forme décimale
+RM#8766 Support des clés TAPK dans la commande d'exportation de clé initiale du terminal
+RM#8746 Import de la clé secrète sous une clé privée ECC (KSEimp)
+RM#8745 Nouveau type de clé KPEimp
+RM#8743 Nouveau type de clé KPEexp
+RM#8738 Intégration de Openssl 3.5.5
+
+Corrections
+-----------
+RM#8731 Support du mode d'usage CCM pour les clés KTOK
+
+
+  #########################
+  # dstr.bnt.in-V1302-01I #
+  #########################
+
+Création : Dec 2 2025, 17:51:02 
+Révision : 86c5640cb7839a0527b6c1308bdc82eab00e8956
+
+Évolutions
+----------
+RM#8728 Retrait des options BCM_* et des commandes associées.
+RM#8713 Ajout de la politique de sécurité permettant d'interdire le calcul de KCV des clés AES utilisant des méthodes obsolètes
+RM#8710 Suppression de l'algorithme DSA et clés KTOD
+RM#8709 Suppression de l'option COFINOGA et des commandes associées.
+RM#8708 Suppression de l'option MPCOS et des commandes associées.
+RM#8707 Contre mesure SCA pour les algo de chiffrement DES et AES
+RM#8489 Intégration de Openssl 3.0.12
+
+Corrections
+-----------
+RM#8735 Coupure de connexion après un controle de KCV lors d'un import TR31 de clés asymétriques
+RM#8734 Migration Openssl 3.0.12 vers 3.0.18
+RM#8731 Support du mode d'usage CCM pour les clés KTOK
+
+
+  #########################
+  # dstr.bnt.in-V1301-14I #
+  #########################
+
+Création : Jun 13 2025, 15:54:52
+Révision : 000272d043115136b938d9e7967a7da2ecc63e19
+
+Évolutions
+----------
+RM#8694 Suppression de l'option COFINOGA du profil AUTH pour mise en conformité avec les exigences SAFIRE
+RM#8692 Désactivation de TLS 1.1 et restriction des suites crypto TLS 1.2
+RM#8690 Suppression du mode de décomposition 2DES en sortie.
+RM#8689 Mise en conformité des longueurs de clés avec les contraintes GCB.
+
+Corrections
+-----------
+RM#8705 Correction d'un conflit entre l'agent SNMP et les traps SNMP v2c
+
+   
+  #########################
+  # dstr.bnt.in-V1301-13I #
+  #########################
+
+Création : May 16 2025, 13:19:40
+Révision : 7d88edcb6b4774b5d03068080ffaaaa8d8fb7bb9
+
+Évolutions
+----------
+Corrections
+-----------
+RM#8687 Corrections apportées sur les clés HMAC
+
+
+  #########################
+  # dstr.bnt.in-V1301-12I #
+  #########################
+
+Création : Apr 18 2025, 12:35:44
+Révision : 2432729dc938bab7b82ac966f86fcfb9857a7b82
+
+Évolutions
+----------
+RM#8673 Support de la dérivation des clés ZKA de classe AES
+
+
+  #########################
+  # dstr.bnt.in-V1301-11I #
+  #########################
+
+Création : Mar 12 2025, 11:15:25
+Révision : 8e4cf08dee6e78f5b2260b7c1b0a86f37cdbab2c
+
+Évolutions
+----------
+
+Corrections
+-----------
+
+
+  #########################
+  # dstr.bnt.in-V1301-10I #
+  #########################
+
+Création : Feb 19 2025, 15:02:32
+Révision : 10be784a94f0682df907e18bc2de654176b0bc63
+
+Évolutions
+----------
+
+Corrections
+-----------
+
+
+  #########################
+  # dstr.bnt.in-V1301-09I #
+  #########################
+
+Création : Oct 22 2024, 21:09:57
+Révision : 8cedb99ca75e38564d04aeaccf0313a15f61257c
+
+Évolutions
+----------
+RM#8572 Support de la clé KENC3 dans les commandes de chiffrement multi-blocs. 
+
+
+Corrections
+-----------
+RM#8590 Correction de fuite mémoire lors de l'authentification avec le serveur Syslog.
+
+
+  #########################
+  # dstr.bnt.in-V1301-08I #
+  #########################
+
+Création : Sep 6 2024, 19:19:47
+Révision : 124b8ef56bd2ab53e65acab62b04c1ed709eb3a1
+
+
+Corrections
+-----------
+RM#8571 Dérivation de la clé BDK incorrecte dans la commande de finalisation de la demande d'établissement des clés CTAP
+
+
+  #########################
+  # dstr.bnt.in-V1301-07I #
+  #########################
+
+Création : Sep 3 2024, 14:23:38 
+Révision : 67b6c60ecd72b4000917471b178f07827d15b6f7
+
+Évolutions
+----------
+RM#8480 Bloc optionnel de padding pour CTAP V11
+RM#8551 Support des CVV dynamiques des cartes Ellipse
+RM#8556 Export de KBPK sous KPexp
+RM#8562 Support de la version 1 du format du header EPI
+
+
+Corrections
+-----------
+RM#8539 Vérification de HMAC EPI sur un message vide
+RM#8569 Erreur 2009 à l'import d'une clé KACS en Aes Keywrap
+RM#8570 Import des clés asymétriques PKCS11 en Aes Keywrap
+
+
+  #########################
+  # dstr.bnt.in-V1301-06I #
+  #########################
+
+Création : Jun 19 2024, 19:12:49
+Révision : 17972
+
+Évolutions
+----------
+RM#8537 Commande de chiffrement/dechiffrement authentifie CCM
+RM#8553 Import/export TR31 de clé ZBPK
+
+Corrections
+-----------
+RM#8510 Recalcule la signature sur l'ensemble de la structure après ajout du SAN.
+        Ajout du booleen critical lorsque le SAN est présent dans le certificat/CSR.
+RM#8516 Erreur lors du chiffrement/dechiffrement multi-blocs de 128 données.
+RM#8518 Pas de controle de coherence de clés pour les clés EdDSA
+RM#8541 Libération des taches bntd_session suspendues lors de l'autotest périodique.
+RM#8554 Mode d'usage des clés ZBPK exportées en TR31
+
+
+  #########################
+  # dstr.bnt.in-V1301-05I #
+  #########################
+
+Création : Dec 8 2023, 14:27:55
+Révision : 17882
+
+Évolutions
+----------
+
+Corrections
+-----------
+RM#8511 Non libération des clés de session chargées en TLS avec authentification USER
+
+
+  #########################
+  # dstr.bnt.in-V1301-04I #
+  #########################
+
+Création : Nov 6 2023, 16:35:57
+Révision : 17873
+
+Évolutions
+----------
+RM#8466 Choix du paramètre "Exportability" lors de l'export TR31
+RM#8476 Chiffrement JWE sans signature JWS pour VISA
+RM#8496 SAN dans les CSR et certificats auto-signés générés par Crypt2Pay
+RM#8497 Import/Export TR31 des clés IMKcpin et IMKlc (Pure CB)
+
+
+Corrections
+-----------
+RM#8474 EngineID pour le service SNMP
+RM#8495 Affichage du SAN des certificats
+RM#8499 Echec de vérification du certificat du serveur syslog
+RM#8502 Arret du service SNMP TLS à la suite d'une mauvaise adresse IP dans le CN du certificat serveur
+RM#8503 Divers correction sur les certificats autosignés générés par le C2P
+
+
+  #########################
+  # dstr.bnt.in-V1301-03I #
+  #########################
+
+Création : Mar 24 2023, 13:01:28
+Révision : 17812
+
+Évolutions
+----------
+RM#8200 Support CHACHA20 et Poly1305
+RM#8295 Suppression de l'option FISC
+RM#8436 Importation de PIN vers le format ISO4
+RM#8280 Dual control pour exporter une clé sous une clé publique RSA
+RM#8456 Longueur minimale des données de dérivation de la clé AV CB
+RM#8557 Changement de priorité du choix des PINPAD
+RM#8458 Usage U_chif_code sur KDK sous condition de l'option DEP_PRAC
+
+
+Corrections
+-----------
+RM#8390 Jetons de clés retournés par la commande FF8128, même en cas d'erreur
+RM#8437 Limitation de la longueur du MAC uniquement pour certains types de clés
+RM#8440 Fuite de données sur trame incorrecte
+RM#8449 Fuite mémoire lors de l'ouverture d'une connexion sur le port 4001
+RM#8463 Fuite mémoire lors de l'utilisation de la commande FF8125
+
+
+  #########################
+  # dstr.bnt.in-V1301-02I #
+  #########################
+
+Création : Nov 23 2022, 18:18:58
+Révision : 17735
+
+Évolutions
+----------
+RM#8338 Support du terminal ingenico Lane 3000
+RM#8355 Export du secure log possible en profil DEV sans etre personnalisé
+RM#8367 Longueur max des données hashées passe à 10000 octets
+RM#8368 Longueur max des données passe à 10000 octets dans les commandes FF4A et FF4B
+RM#8369 Longueur max des données chiffrés passe à 10000 octets dans le chiffrement authentifié
+RM#8389 Transchiffrement ISO1 -> ISO1 autorisé
+RM#8418 Changement de longueur des clés HMAC générées pour CTAP V11
+ 
+
+Corrections
+-----------
+RM#8410 Padding des coordonnées du point pour la signature Schnorr
+
+
+  #########################
+  # dstr.bnt.in-V1301-01I #
+  #########################
+
+Création : Oct 6 2022, 18:08:41
+Révision : 17693
+
+Évolutions
+----------
+RM#8199 Support EdDSA (FIPS 186-5)
+RM#8279 Masquage de la longueur de la clé en export TR31 de clés statiques
+RM#8285 Export de BDK sous KBPK
+RM#8286 Importation de clé BDK dynamique
+RM#8287 Type de clé ZBPK pour import/export de clés statiques TR31
+RM#8288 Clé KAL AES
+RM#8298 Certification des HSM pour le SPP
+RM#8313 Nombre d'administrateurs et role d'administrateurs délégué à la sécurité
+RM#8314 Autorisations de l'administrateur délégué à la sécurité
+RM#8315 Chargement des .cert à partir du menu Crypto Users
+RM#8318 Portée des contextes TLS chargés par les administrateurs
+RM#8322 Support des clés KISE
+RM#8323 Support du format de point compressé retenu par EMV (SB 243) en vérification de signature
+RM#8324 Support de la signature EC-SDSA optimisée
+RM#8326 Clé ECC carte conformes à EMV SB243
+RM#8327 Import/export TR31 des clés asymétriques émetteur
+RM#8339 Controle du KCV en import TR31
+RM#8343 CMAC avec KSukpt
+RM#8345 Support des clés KACS et WMK dans les commandes d'import/export TR31
+RM#8352 Vérouillage de la possibilité d'authentification d'un administrateur par certificat
+RM#8359 Identifiants des éléments SPP à distinguer des identifiants des éléments TLS
+RM#8375 Support de l'algorithme de signature EC-SDSA standard
+RM#8382 Clés publiques certifiées contenant un certificat de clé ECDSA
+RM#8383 Clés SPPK
+RM#8386 Suport de la cryptographie pour CTAP V11
+ 
+
+
+Corrections
+-----------
+RM#8281 Problème d'affichage après chargement d'un certificat dont la date d'expiration est supérieure à 2050
+RM#8290 Sortie de clé possible malgré l'authentification de porteur obligatoire et pas de KCCM présent en base
+RM#8294 Absence de message de log à la génération de CSR
+RM#8301 Echec de double controle sur la page de download si la longueur du login ou du mdp du second admin est égale à 20 caractères
+RM#8304 Trace d'authentification des porteurs dans la commande de sortie de clé symetrique
+RM#8317 Plantage du secure SNMP agent après renouvellement des éléments SSL/TLS
+RM#8328 Plantage du simu après annulation d'une lecture carte
+RM#8335 Version du header TR31 dans la génération de clé dynamique et export TR31
+RM#8337 Plantage au redemarrage des agents SNMP
+RM#8338 Ajout de l'identifiant USB du terminal Lane 3000 dans la liste blanche
+
+
+  #########################
+  # dstr.bnt.in-V1205-04I #
+  #########################
+
+Création : Jan 24 2022, 19:57:49
+Révision : 17484
+
+SHA256:    AB71D9D6 29980A86 A33DAE5C CC44AD1B 
+           674D5BBF 1B49FAC8 C1085CB6 3853D6B1
+
+
+Évolutions
+----------
++++ V1205-03 +++
+RM#8173 Positionnement de l'usage de clé TR31 pour l'export des clés KSC
+RM#8210 Enchainement des commandes de lecture carte et d'introduction des clés de transport
+RM#8215 Suppression du support de l'ISO2 en entrée de la commande de transchiffrement
+RM#8219 PCIPTS : Controle des composantes de clés papier introduites
+RM#8220 PCIPTS : Contrôle d'unicité des clés
+
+
+Corrections
+-----------
+RM#8249 Positionne correctement l'usage et le mode d'usage dans le bloc TR31 lors de l'export d'une clé KBPK
+RM#8253 Code retour incohérent lors d'une erreur dans le contrôle du header d'un bloc TR31
+RM#8254 Vérifier la cohérence des données du champ optionel dans les commandes d'export TR31
+RM#8257 Controle des longueurs des clés dérivées en DUKPT
+RM#8277 Envoi de traps SNMP ne fonctionne pas
+RM#8278 Modification de l'utilisateur crypto en cas d'enregistrement d'un porteur (FF810F) quand le pinpad n'est pas branché
+
+
+  #########################
+  # dstr.bnt.in-V1205-02I #
+  #########################
+
+Création : Jul 29 2021, 20:31:31
+Révision : 17193
+
+SHA256:    201B358B 162BD271 4BA887BB C53288A4 
+           25055F36 A8871B16 1711DFB8 F1E05547
+
+Évolutions
+----------
+RM#8172 Limitation de la longueur du MAC DES par Politique de Sécurité
+RM#8191 Algorithmes BPS et PAX non validés pour PCI
+
+
+Corrections
+-----------
+RM#8187 Chargement de certificat X509 tronqué
+RM#8198 Erreur d'accès mémoire lors de la réception d'un code retour SafePad inconnu
+RM#8201 Conversion de kid en hexa
+RM#8202 Longueur du salt dans la signature PS256 pour Visa VTS v3
+RM#8203 Authentification du Header lors du chiffrement GCM256 du JWE
+
+
+
+  #########################
+  # dstr.bnt.in-V1205-01I #
+  #########################
+
+Création : Jun 22 2021, 17:49:16
+Révision : 17145
+
+SHA256:    801E1E2E 344AFD45 BBADC409 5379C88A 
+           D82C98C5 80BD75C8 D78D151D 4017183D
+
+Évolutions
+----------
+RM#7999: Longueur des clés KDKA, KDKS et KDKP
+RM#8001: Scellement OGDC avec des clés AES
+RM#8017: Version de clé dans les blocs TR31
+RM#8047: Mécanisme de Wrapping KEY_WRAP_PAD
+RM#8054: Raccordement RSB avec des clés AES - génération
+RM#8055: Raccordement RSB avec des clés AES - Importation
+RM#8056: [GCB2021] Export de clé KPBK AES vers la STET sous KCGC (KDKA)
+RM#8066: Suppression de la clé KV
+RM#8076: Transchiffrement de PIN Block ISO4 avec changement de diversifiant
+RM#8081: [GCB2021] : Renomage de KDKA en KCGC et extension en AES256
+RM#8089: [GCB2021] Enchainement de commandes carte sans retrait de la carte
+RM#8098: [GCB2021] Support d'un TK LMK
+RM#8107: Suppression des clés simples KDK1, KME1, KTK1, KT1, KSC1
+RM#8108: Suppression du processus spécial de déchiffrement de PIN
+RM#8109: Suppression des TK KC9T, KC9H et KC9R
+RM#8123: KCV Global Platform support dans la commande d'export de clé
+RM#8125: Accélération de la lecture des cartes eGPK (v03.02 ou supérieures)
+RM#8126: Controles de propriétaire en import/export TR31
+RM#8135: Méthodes de dérivation CONCATENATE DATA AND BASE
+RM#8136: Suppression du support des clés de 64 bits pour KMC, KCVX, KCVC, KPV et KTOK
+RM#8143: Exportation de la clé initiale du terminal sous KBPK
+RM#8150: Controle de la nature en export TR31
+RM#8152: Export TR31 des clés HMAC
+RM#8157: Choix de l'heure de l'auto-test
+RM#8158: Longueur max des données signées
+RM#8160: Longueur du tag DF8424 dans la commande FF826D insuffisante
+
+
+Corrections
+-----------
+RM#8151: Faille de type privilege elevation lors de l'authentification client SSL sur l'interface d'administration
+
+
+
++++ V1204-06 ++++
+
+Corrections
+-----------
+RM#8057 Erreur lors d'un chargement de ficher contenant 2 KC2P
+RM#8080 Rincage des buffers utilises par les commandes crypto
+RM#8077 Attribut Nature dans un jeton de KST sous KMS
+RM#8129 Erreur de verification de KCV (permission denied)
+RM#8130 HTTP timeout lors de l'activation/desactivation de l'agent SNMP
+
+
+
+
+
+  #########################
+  # dstr.bnt.in-V1204-05I #
+  #########################
+
+Création : Dec 3 2020, 14:38:53 
+Révision : 16798
+
+SHA256:    DBC806F5 939C6B5D 2622CE31 F9FAA240 
+           4982D027 55D1A45A 23A5F312 D4A60224
+
+Évolutions
+----------
+RM#8012 Réduction des clés DES triple
+
+Corrections
+-----------
+RM#7966 Erreur de KCV lors du déchiffrement d'un jeton contenant l'attribut sensible Nature
+RM#7970 Attribut Nature présent dans le jeton EF transchiffré pour version V707
+RM#7971 Controle de nature de clé lors de l'export et non pas lors de l'import
+RM#7975 Production de jetons scellés pour des versions compatibles <= V803
+RM#8006 [Openssl] Erreurs lors de connexions TLS simultanées
+RM#8007 Scellement des entetes OGDC avec des clés KDKS
+RM#8008 controle abusif du type d'identifiant de la clé de déchiffrement dans FF6B
+RM#8015 corruption mémoire lors de l'envoi d'une trap SMNP
+
+
+  #########################
+  # dstr.bnt.in-V1204-04I #
+  #########################
+
+Création : Sep 3 2020, 10:43:44 
+Révision : 16348
+
+SHA256:    55CD7362 2803E320 65E1EF58 19A6C634 
+           5E52863E 8A93BC8B A7974081 D56CE15B
+
+Évolutions
+----------
+RM#5975 Certaines méthodes de dérivation de clef PKCS#11 doivent être interdites ou dépréciées
+RM#7539 [GCB2020] Décomposition de la sortie de clés
+RM#7541 Ajout de comptes "invité"
+RM#7546 [GCB2020] Nouveau type de clé KDKA
+RM#7558 [GCB2020] Impression de compléments d'information sur les tickets de composantes de clés
+RM#7560 [GCB2020] Tirage et export de WMK
+RM#7562 [GCB2020] Fonction de dérivation de WPK
+RM#7565 [GCB2020] Selection du fichier de clé sur carte par son identifiant d'export
+RM#7566 [GCB2020] fonction de lecture du contenu des cartes porte clés
+RM#7618 [GCB2020] Option privative GCB_KEYS
+RM#7634 [GCB2020] Support des formats RACAL et IBM des clés RSA en import
+RM#7635 [GCB2020] lecture des cartes B0’ V2 pour les clés KDKP, KDKS et KDKA
+RM#7637 [GCB2020] transchiffrement de clé symétrique avec changement d’IdP
+RM#7758 Suppression de la clé LLSK
+RM#7773 [GCB2020] Ajout de la nature de la clé dans le jeton E1 et EF
+RM#7821 [GCB2020] Support des clés KDKS
+RM#7854 Support de SHA2-512 et SHA3-512 dans le calcul de HMAC SPA
+RM#7867 [CAVS] Vérifier la conformité FIPS 186-4 des versions V1204
+RM#7877 Nouvelle classe de clé HMAC-SHA3
+RM#7885 [GCB2020] Introduction directe de clé dans le HSM
+RM#7887 [GCB2020] Création de KDKM éphémère
+RM#7891 [GCB2020] vecteur de controle dans l'import/export des clés asymétriques
+RM#7903 [GCB2020] parsing de la structure FF40 (Format ID et Nature
+RM#7914 Conversion des TK lors de l'export TR31
+RM#7937 Fonction d'effacement de carte à puce
+RM#7938 Forcer l'authentification des Users
+RM#7939 Calcul du CVV dynamique
+RM#7945 [GCB2020] EB - Suppression du controle propriétaire clé de déchiffrement
+RM#7946 [GCB2020] FF6B - Suppression du controle propriétaire clé de déchiffrement
+RM#7948 Ajout du choix du type de KCV dans la commande de vérification de clé.
+RM#7956 Longueur minimale du HMAC SPA à vérifier = 2
+
++++ V1204-03 +++
+RM#7917 CVE-2020-1967 : Mise a jour vers OpenSSL 1.1.1g
+RM#7881 CAVV U3 v7
+RM#7865 Cle KAAV de classe HMAC SHA2
+RM#7808 Autorité de certification de confiance par service
+RM#7351 Gestion du renouvellement des éléments SSL
+RM#7864	Display allowed TLS protocols in console
+RM#7860 Ajout d'un client syslog
+RM#7833	Support de VISA VTS V3
+RM#7349 Possibilité de modifier le DN des certificats client et serveur. Choix de la taille de la clef privée.
+RM#7669	Gestion de deux contexte SSL/TLS (serveur + client)
+RM#7710	Utilisation de SHA256 dans les certificats auto-signés
+
+
+
+Corrections
+-----------
+RM#5645 Incohérence dans la gestion des utilisateurs de la base de clef
+RM#7102 Controle de la longueur du modulo lors d'une importation d'une clé RSA
+RM#7591 Erreur de lecture des cartes B0 suite à saisie code faux
+RM#7875 Importation de clé ECDSA sans KCV
+RM#7921 Le message de log "Incoming connection accepted from user XXX" n'est plus tracé systématiquement
+RM#7926 iat en heure UTC dans les JWE
+RM#7929 Code retour Timeout 3017 sur commande de changement de PIN
+RM#7955 Gestion de l'IV dans la commande de chiffrement des données vers la carte
+RM#7959 Disfonctionnement de SNMPS
+
++++ V1204-03 +++
+RM#7900 Pas de padding dans les encodages base64url pour les commandes crypto concernées
+RM#7853 Correction fuite mémoire lors de chargement de fichier DER
+RM#7852 Correction fuite mémoire
+RM#7812 Corrige un problème d'affichage de l'autotest périodique sur CHR
+RM#7653 L'init du DRBG est failed
+RM#7782	Le type de KCV de la KM2bntx n'était pas conservé en SRAM
+RM#7819 La longueur de l'AVCB doit etre de 5 octets au lieu de 4
+
+
+  #########################
+  # dstr.bnt.in-V1204-02I #
+  #########################
+
+Création : Dec 4 2019, 15:34:45
+Révision : 15856
+
+SHA256:    493DE79C B868E384 2836CFA4 774DEA61 
+           EDF77E0D 88668EA4 2FB7A629 77A08132
+
+Évolutions
+----------
+RM#7464 Champs optionnels TR31 dans la commande FF826E
+RM#7670 Longueur des données scellées (commandes F8 et F9)
+RM#7691 Vérification de signature avec TAPK
+RM#7732 Support du Secure Channel IAS ECC V2 (AES)
+RM#7743 Commandes de chiffrement/déchiffrement multi-blocs
+
+Corrections
+-----------
+RM#7680 Les diversifiants de PIN Block doivent être décimaux dans la commande de transchiffrement
+RM#7681 Controle du KEV des clés importées en DES CBC
+RM#7703 Controle d'usage abusif lors de la vérification de preuve AV-CB
+
+
+
+  #########################
+  # dstr.bnt.in-V1204-01I #
+  #########################
+
+Création :  Jul 8 2019, 16:31:40 
+Révision : 15632
+
+SHA256:    FBBBA373 EF9202C1 336DA82D CEADD5C3 
+           141F3E36 94CCD396 FF90872F DBE38CC3
+
+Évolutions
+----------
+RM#7332 MAJ Openssl (version 1.1.1) avec support de TLS 1.3
+RM#7500 Authentification des comptes d'administrations par cookies
+RM#7602 Usage et mode des clés TR31 exportées
+
+Corrections
+-----------
+RM#7521 Fin du support de SSL3/TLS1.0
+RM#7626 Calcul du CRC dans la commande FF 81 22
+RM#7633 Erreur de formatage de la commande Change PIN CVN 18
+
+
+
+  #########################
+  # dstr.bnt.in-V1203-14I #
+  #########################
+
+Création : May 2 2019, 11:55:41
+Révision : 15380
+
+SHA256:    418F1930 1530FFC9 736FE709 CB0D8F59 
+           6C934F50 6147CBB8 EF88D91C 1C77FA9F
+
+Évolutions
+----------
+RM#7587 Longueur des données à sceller pour les enregistrements OGDC
+RM#7596 Scellement des enregistrements OGDC de clés asymétriques
+
+Corrections
+-----------
+RM#7485 Longueur minimale des clés KAAV (MAJ)
+RM#7598 Calcul des clés de session SCP03 de longueur différente de la clé maitre KMC
+RM#7599 Memcmp timingsafe
+
+
+  #########################
+  # dstr.bnt.in-V1203-13I #
+  #########################
+
+Création : Apr 4 2019, 16:15:17
+Révision : 15324
+
+SHA256:    04776520 6C5798BA F4EC9E3B F70BD915 
+           91A7F911 8648FDB0 E072F396 E1C0DD1C
+
+Évolutions
+----------
+RM#7482 Usage U_heritage de la clé KTK 
+RM#7496 Classe des clés dynamiques importées en TR31
+RM#7574 Controle de propriétaire assoupli dans la commande FF8122
+
+Corrections
+-----------
+RM#7485 Longueur minimale des clés KAAV (vérification et export)
+RM#7494 Mauvaise valeur du champ RFU dans le header TR31 (FF826E)
+
+
+  #########################
+  # dstr.bnt.in-V1203-12I #
+  #########################
+
+Création : Jan 29 2019, 16:55:10 
+Révision : 15221
+
+SHA256:    9BF48DCF F6418B16 A69D54E1 5CF1359C 
+           8C564199 C1B75B20 F2696D06 7620FADC
+
+Évolutions
+----------
+RM#7445 Choix de l'algorithme dans l'export au format ATALLA 
+RM#7453 Algorithme de wrapping des clés Linky 
+
+Corrections
+-----------
+RM#7448 Transchiffrement de clé RSA de longueur (en octets) impaire
+RM#7469 Perte de context SSL au reboot
+RM#7470 [Admin] "Change policy" validation d'un formulaire par la touche ENTER
+
+  #########################
+  # dstr.bnt.in-V1203-11I #
+  #########################
+
+Création : Nov 30 2018, 15:24:25 
+Révision : 15152
+
+SHA256:    0C6C80D9 D3645499 26586596 93C7DAC1 
+           7C0C9D68 65981BAE 266FE443 157C086D
+
+Spécifications 12.03.07
+               12.03.08
+
+Évolutions
+----------
+RM#7348 Commande FF8247 dans l'option LORA 
+RM#7352 Génération TR34 - Mise à jour 
+RM#7353 Génération d'une clé dynamique de chiffrement de données 
+RM#7354 Génération de clé dynamique et export TR31 - Modification
+RM#7355 Importation de clé dynamique TR31 - Mise à jour
+RM#7356 Vérification du certificat du DAB - Mise à jour
+RM#7357 Type de clé KBPK
+RM#7361 Transmission de U_clear dans la dérivation DUKPT
+RM#7362 Type de KCV lors de la sortie de clé
+RM#7363 Clé CC-LAN dérivée dans la commande d'exportation des clés du compteur Linky
+RM#7364 Création d'une commande de dérivation des clés du compteur Linky
+RM#7365 Controle du niveau de sécurité en dérivation DUKPT et export TR34
+RM#7366 Importation de code confidentiel sous clé éphémère AES (FF6D)
+RM#7370 Option OATH dans le mode d'opération PCI_FRONT
+RM#7376 Pas de suppression des "," dans les blocs TR31 dynamiques importés
+RM#7405 "Key usage" TR31 des clés KSC exportées
+RM#7406 Nouveau type de clé KACS (0xD3)
+RM#7407 Options AVCB_A et AVCB_I
+RM#7408 Commandes de calcul et de controle de la preuve AVCB
+
+Corrections
+-----------
+RM#7403 Key version number incorrect lors de la génération de blocs TR31/TR34
+
+
+
+  #########################
+  # dstr.bnt.in-V1203-10I #
+  #########################
+
+Création : Oct 30 2018, 14:36:18 
+Révision : 15055
+
+SHA256:    9ECCCAE7 1B5AC293 3C794DFA CED656C3 
+           A65BF8C5 A9100A06 8C69F36E B1B317F3
+
+Spécifications 12.03.04 
+               12.03.05
+               12.03.06
+
+Évolutions
+----------
+RM#6238 Support du TR34
+RM#7209 Ne plus lier un fichier d'option à une version logiciel
+RM#7252 Commande de création de clé KTK non compatible avec les exigences PCI
+RM#7253 Commande de MAC des enregistrements OGDC
+RM#7372 Clés KTukpt, KSukpt et KDukpt de classe AES
+
+V1203-09
+RM#7060 Support du DUKPT AES (X9.24-3:2017)
+RM#7101 Support des clés BDK AES
+RM#7153 Commande de mise à jour de clé initiale du terminal DUKPT 2017
+RM#7192 Support des blocs optionnels lors de l'export TR31
+RM#7242 Commande de vérification du certificat du DAB (NAC 2020)
+RM#7243 Clé publique certifiée KDp
+RM#7256 Options Encrypt et PKCS11 dans le profil KMC
+RM#7285 Longueur minimale des clés KAAV
+RM#7286 Longueur minimale des secrets DSGSS
+
+
+Corrections
+-----------
+RM#7001 Commande de génération de l'AC autorisée si l'option EMV_DP est activée
+RM#7196 Controle de la longueur réelle de la clé DES lors du transchiffrement
+RM#7371 Transchiffrement incorrect vers le format ISO4 pour les PIN de longueur impaire
+
+V1203-09
+RM#7259 Suppression de l'option CARDINK_Migrate et des commandes FF6C et FF8204
+RM#7334 Dérivation des clés de session SCP03
+
+
+
+  #########################
+  # dstr.bnt.in-V1203-08I #
+  #########################
+
+Création : Jul 24 2018, 08:49:20
+Révision : 14900
+
+SHA256:    C50377A7 29483AA4 92CCEBBB BAF79138 
+           414BC3F2 6D465859 6DA03652 CF0B881A
+
+Spécifications 12.03.04 
+               12.03.05
+               12.03.06
+
+Évolutions
+----------
+RM#6263 KCV des clés AES dans les jetons de clés
+RM#7009 Commandes de chiffrement et de déchiffrement de message VTS en mode Shared Secret
+RM#7156 KCV des clés dans les exports
+RM#7182 Support du TR31 version D
+RM#7225 Valeurs de diversification des clés maitres SCP03 (FF816C)
+RM#7239 KCV Global Platform pour les clés carte
+RM#7240 Commande d'exportation des clés du compteur Linky
+RM#7241 Valorisation du Key version number dans les blocs TR31
+RM#7244 Option LINKY_FAB
+RM#7265 Option FULL_IP toujours disponible
+RM#7274 Commande d'exportation des clés du concentrateur Linky
+RM#7284 Longueur des données de diversification
+RM#7294 Gestion des clés dynamiques échangées au format TR31
+
+Corrections
+-----------
+RM#7249 Corruption mémoire après un KCV check
+RM#7250 Chiffrement du PIN block IAS_ECC en mode ECB au lieu de CBC
+RM#7289 Commande de découverte des compteurs et concentrateurs LINKY disponible
+        sans l'option SMART_M
+RM#7293 Chiffrement de PIN block incorrecte avec une clé DES 192 bits (FF6D)
+
+
+  #########################
+  # dstr.bnt.in-V1203-07I #
+  #########################
+
+Création : Jun 8 2018, 13:31:01
+Révision : 14784
+
+SHA256:    47F15FAA 30535030 8515C538 B6EC0956 
+           CF0A2C0F 09B1706C BB77D61A 30B6684E
+
+Spécifications 12.03.04 
+               12.03.05
+
+Évolutions
+----------
+RM#7231 Commandes de découverte du concentrateur et du compteur Linky
+RM#7230 Commande FF49 de création de clé autorisée avec l'option CGDC
+RM#7228 Support des clés LLSK
+RM#7227 Support des clés PKmob et PKmac en AES 128 bits
+RM#7179 Support des clés PMKfi de classe HMAC SHA2
+
+Corrections
+-----------
+RM#7224 Données d'authentification dynamique calculées avec le mauvais challenge (F5)
+
+
+  #########################
+  # dstr.bnt.in-V1203-06I #
+  #########################
+
+Création : May 23 2018, 11:35:06 
+Révision : 14734
+
+SHA256:    0C8D7879 4D875F52 A3BA7866 CA5161A0 
+           C92D149E 8EAB0CA1 6A29406D FD5076FC
+
+Corrections
+-----------
+RM#7186 Chiffrement OAEP incorrect dans la commande FF8269
+
+
+  #########################
+  # dstr.bnt.in-V1203-05I #
+  #########################
+
+Création : May 3 2018, 16:29:27
+Révision : 14723
+
+SHA256:    A944D3D0 E9566588 95E3F64C 632A68B2 
+           E329C8FF CCEC5851 4398AC0F 500F0AAC
+
+Évolutions
+----------
+RM#7210 Longueur minimale des mots de passe d'admin
+
+Corrections
+-----------
+RM#7186 Contrôle trop strict sur la longueur de la clé lors d'une dérivation PKCS11
+        en mode compteur
+RM#7180 Contrôle abusif du format des blocs optionnels TR31 en import
+
+
+  #########################
+  # dstr.bnt.in-V1203-04I #
+  #########################
+
+Création : Mar 30 2018, 14:41:29
+Révision : 14639
+
+SHA256:    64631B19 1F3A1665 B61B0045 14598568 
+           B8DF4879 05F9D11B EE894892 377391A1
+
+Spécifications 12.03.03 (15 février 2018) (implémentation partielle)
+               12.03.04 (implémentation partielle)
+
+Évolutions
+----------
+RM#7147 Support SPA2 et BEPAF dans le commande de génération de HMAC SPA
+RM#7146 Support du SPA2 dans la commande de vérification du HMAC SPA
+RM#7121 Quotas par plage de 3 heures
+RM#7105 Support du CVV2 JCB
+
+Corrections
+-----------
+RM#7154 Fuite mémoire à chaque requète SNMP TLS
+RM#7145 Fuite mémoire lors de la fermeture d'une connexion authentifiée
+RM#7144 Fuite mémoire dans la commande FF8248
+RM#7143 Fuite mémoire dans les commandes FF6E, FF822D, FF822E en cas d'erreur dans le certificat
+
+
+  #########################
+  # dstr.bnt.in-V1203-03I #
+  #########################
+
+Création : Feb 23 2018, 10:41:18 
+Révision : 14551
+
+SHA256:    D090D2CA 10BF9777 A631926D 1B549C48 
+           95DE3AB6 550B76C1 FFD55EB0 6F177AE7
+
+Spécifications 12.03.02 (6 décembre 2017)
+               12.03.03 (15 février 2018) (implémentation partielle)
+
+Évolutions
+----------
+RM#7119 Support de CKM_SP800_108_COUNTER_KDF dans la commande de dérivation des clés PKCS#11
+RM#7082 Ajout de la possibilité de chiffrement des données reçues de VISA VTS
+RM#7077 Commandes d'établissement des clés pour le Security provider CTAP
+RM#7076 Support des clés SPDK
+RM#7075 Support des clés TAPK
+RM#7069 Limitation du calcul du sceau itératif en fonction du type de clé
+RM#7062 Support du Stack-UKPT C-TAP
+RM#7066 Gestion de la liste orange différentiée par clé de vérification
+RM#7059 Commande de chiffrement/déchiffrement d'IBAN
+RM#7003 Commande de chiffrement et d'authentification du message VISA Token Service Issuer V2
+
+Corrections
+-----------
+RM#7122 Controle trop strict lors d'une restauration de configuration
+RM#7117 Fuite mémoire sur les commandes FF6E, FF822D et FF822E
+RM#7093 Résultat de l'algorithme BPS faux dans le cas où le tweak data se termine par 00
+RM#7080 Configuration des access list rend le HSM inaccessible
+
+
+  #########################
+  # dstr.bnt.in-V1203-02I #
+  #########################
+
+Création : Dec 13 2017, 17:02:55
+Révision : 14447
+
+SHA256:    DE9F7B6F 058CD38E 347E6EC5 5726E55A
+           FB537F39 5967C353 8825D5E8 1F5D1646
+
+Spécifications 12.03.01 (10 juillet 2017)  (implémentation partielle)
+               12.03.02 (implémentation partielle)
+
+Évolutions
+----------
+RM#7063 Recuperer la date du HSM
+RM#7065 Longueur des cles de devices importees (FF 82 42)
+(A determiner) Support du TLS pour l'agent SNMP
+
+Corrections
+-----------
+RM#7058 Réinitialisation des quotas au changement d'heure
+RM#6725 Evolution quotas pour l'ANTS
+
+  #########################
+  # dstr.bnt.in-V1203-01I #
+  #########################
+
+Création : Dec 5 2017, 14:48:01 
+Révision : 14361
+
+SHA256:    5331EDC2 D4694293 CEC22D86 FCF587E2 
+           AD9E9A68 F496CAAE 68BEA2DD F20640FB
+
+Spécifications 12.03.01 (10 juillet 2017)  (implémentation partielle)
+               12.03.02 (implémentation partielle)
+
+Évolutions
+----------
+RM#6943 Support du format DEP pour l'importation de clés RSA
+RM#6965 Commande de chiffrement des données vers MDES
+RM#7004 Clés DSISK, DSSEK et DSGSS
+RM#7044 Support du Berliner MAC dans la commande de dérivation de clés ZKA
+RM#7049 Support des clés BDK DES 192 bits
+RM#7051 Importation de clé de chiffrement de device sans dérivation
+RM#7057 Récupération des informations de RAM et de mémoire Sécurité au travers de SNMP
+
+Corrections
+-----------
+RM#7048 Importation AES KeyWrap d'une clé se terminant par des octets nuls
+
+
+  #########################
+  # dstr.bnt.in-V1202-06I #
+  #########################
+
+Création : Sep 28 2017, 15:51:31
+Révision : 14308
+
+SHA256:    37FA9B1F 9077B00B 83275CEB F2804278 
+           57D71679 7E0E3427 D1DE8649 0417FAE1
+
+Spécifications 12.02.05 (10 aout 2017)
+
+Évolutions
+----------
+RM#6962 Support des longueurs AES 192 et 256 bits pour les clés cartes BCMC 
+
+Corrections
+-----------
+RM#6972 AAD dans le déchiffrement du JWE
+RM#6974 Codage des éléments du bi-clé carte en sortie de la commande FF8262
+- L'agent SNMP v3 n'accepte que les requetes dont le niveau de sécurité est authPriv
+
+
+
+  #########################
+  # dstr.bnt.in-V1202-05I #
+  #########################
+
+Création : Aug 17 2017, 14:00:09 
+Révision : 14274
+
+SHA256:    526F4186 5B7CB4B3 7D866988 349D0486 
+           778E422A 5CBC87A6 0BAC48F1 7E95A431
+
+Spécifications 12.02.05 (10 aout 2017)
+
+Évolutions
+----------
+RM#6821 Impression des composantes de clés au format A4
+RM#6917 Commande FF 82 62 d'exportation de bi-clé carte
+RM#6945 Monitoring SNMP
+
+Corrections
+-----------
+RM#6938 Prise en compte des modifications dans le support de Lora 1.1
+
+
+
+  #########################
+  # dstr.bnt.in-V1202-04I #
+  #########################
+
+Création : Jul 12 2017, 17:29:35
+Révision : 14207
+
+SHA256:    40CF0B39 BEC10624 35C7A2D8 34C96B0A
+           D0D2EDA2 4343BA4E 677FD47E E2F5485C
+
+Spécifications 12.02.04 (20 avril 2017)
+
+Évolutions
+----------
+RM#6745 Support de LoRa 1.1 dans le JoinRequest
+RM#6803 Compteurs Issuer Application Data chiffrés de 16 octets
+RM#6825 Mécanismes PureHCE et BCMC pour la génération des clés à usage limité
+RM#6826 Commande de génération de sealATC
+RM#6883 Support du dCVV OATH Oberthur
+RM#6896 Support du format de bloc de clé IBM version 01
+RM#6901 Chargement des clés publiques certifiées à partir de l'administration
+RM#6909 Vecteur de contrôle dans la commande d'export de clé
+
+Corrections
+-----------
+RM#6918 Fuite mémoire lors du tirage d'une clé ECDSA brainpoolP512r1
+
+
+
+  #########################
+  # dstr.bnt.in-V1202-03I #
+  #########################
+
+Création : Jun 13 2017, 13:07:02
+Révision : 14157
+
+SHA256:    BCFDADE4 FF3B5BCF E3BBAC3E BF97E1BD
+           9115C4EC 1FC0A481 92283583 E71D1EEC
+
+Spécifications 12.02.03 (09 mars 2017) (implémentation partielle)
+               12.02.04 (20 avril 2017) (implémentation partielle)
+
+Évolutions
+----------
+RM#6686 Suppression du support de MONEO
+RM#6750 Suppression de l'option ANSI2
+RM#6752 Création du profil WALLETP et de l'option WALLET_I en version CB uniquement
+RM#6753 Commande de calcul du cryptogramme de transaction de Wallet
+RM#6754 Support de la clé WPK
+RM#6783 Support des versions B et C du format TR31 dans les commandes d'importation et 
+        d'exportation de bloc de clé TR31
+RM#6807 Commande d'exportation de clé au format IBM
+RM#6813 Commande d'exportation de clé au format Atalla
+RM#6823 Support du format 1 (Atalla) dans la commande d'importation
+RM#6824 Importation de clés IBM
+
+Corrections
+-----------
+RM#6722 L'option WALLET_A n'est plus autorisée en version Intégrale
+RM#6880 Erreur de lors du déchiffrement JWE et lors de la vérification de signature JWS
+
+  #########################
+  # dstr.bnt.in-V1202-02I #
+  #########################
+
+Création : Mar 27 2017, 17:34:01
+Révision : 14061
+
+SHA256:    4979FF8F 4A98269E A9D666B7 EAB0CE53 
+           4F976102 AAA4723B 19FE1E0C 0BF60C6A
+
+Spécifications 12.02.03 (02 mars 2017) (implémentation partielle)
+
+RM#6781 Chargement des fichiers .RSA depuis l'interface d'administration 
+		et ignore les informations complémentaires au lieu de bloquer dessus.
+RM#6763 Support des clefs IMKcPIN et IMKLC
+RM#6738 Chargement des fichiers de clés .KST depuis l'interface d'administration
+RM#6725 Quotas des utilisateurs crypto
+RM#6711 Extension des options commerciales
+RM#6688 Support des clés KSKI et DSIDK dans la commande F5. L'indicateur "propriétaire présent" 
+		doit etre positionné
+RM#6684 Support de l'algorithme de hachage SHA1 pour le chiffrement OAEP
+RM#6676 Support de la clef WSD
+RM#6675 Support des clefs DSIDK et DSSSK
+RM#6671	[Emulateur] Ajoute l'option -d pour indiquer dans quel répertoire 
+		on souhaite sauvegarder les fichiers utiles au fonctionnement de la simu
+RM#6613 Support de la méthode de dérivation PBKDF2 HMAC SHA1
+RM#6604 Niveaux d'authentification CRYPTOs SSL/TLS, génération de CSR 
+		et chargement de certificat SSL au format DER
+RM#6601 Support des algorithmes VISA CVN 18 et VISA CVN 22 dans les commandes EMV
+
+Augmentation de la taille des buffers de traitement des commandes crypto 
+	et de la taille de la pile des tâches bnt_sess suite à RM#6679
+
+Corrections
+-----------
+RM#6767 Impossible de déchiffrer le PIN block lorsque le format est ISO3 et que le PAN est fourni (FF8228)
+RM#6765 Absence de contrôle de groupe lors du décodage du jeton de clef publique certifiée
+RM#6762 Impossible d'imposer un jeton d'une clé asymétrique inactive
+RM#6687 Correction des dérivations de clés pour le projet Ondeo
+RM#6674 Options chargées retournées par l'auto-test
+RM#6666 Double la taille des buffer contenant les certificats X509
+RM#6638 Plantage lors d'un chiffrement DES d'un message d'une longueur non multiple de 8 octets. (FF4B, FF8129, FF812E)
+RM#6537 Coupure de connexion lors de l'utilisation d'un jeton de clef publique EC (courbes elliptiques)
+
+
+
+  #########################
+  # dstr.bnt.in-V1202-01I #
+  #########################
+
+Création : Nov 30 2016, 15:27:20
+Révision : 13900
+
+SHA256:    20946B13 00B417EA 565C78AE AF28FD51
+           E1AFE89E 03E6E148 2307AFAD 7FD94D2D
+
+Spécifications 12.02.01 (en cours de rédaction)
+
+Évolutions
+----------
+Evolution	#6596: Extension du nombre maxi de connexions à 128                                       
+Evolution	#6579: Exportation des clés de device en mode AES CBC dans FF822C                         
+Evolution	#6578: Support de la méthode de déchiffrement AES pour l'import des clé de devices FF8242 
+Evolution	#6577: Commande FF 82 48 de génération de clé de chiffrement de clés de devices           
+Evolution	#6576: Commande FF8247 d'importation de clé de chiffrement de clé de device               
+Evolution	#6544: Commandes Compteurs communicants (non privatives)                                  
+Evolution	#6543: Option SMART_Metering                                                              
+
+
+Corrections
+-----------
+Anomalie	#6533: PAN de 20 digits accepté dans la commande FF47 de dérivation de clé carte          
+Anomalie	#6588: Inversion du format de la date pour le calcul du CVV dynamique VISA et TVV04
+
+
+
+  #########################
+  # dstr.bnt.in-V1201-06I #
+  #########################
+
+Création : Sep 28 2016, 11:11:31
+Révision : 13719
+
+SHA1:      D54F27DC 53C3F808 D7B3F2BB DB0B9E53 B9FBAEFD
+SHA256:    2CA7240E 545FDA7A F24FC1F8 0B56B4F8 
+           73C73DF1 C8AD0325 21CB207A 594053F1 
+
+Spécifications 12.01.05 (27 juin 2016)
+
+Évolutions
+----------
+Evolution	#6486: Nouvelles vitesses pour le ralentisseur
+Evolution	#6214: Renouvellement du certificat serveur auto-signé du HSM
+Evolution	#6198: Commande de vérification de cryptogramme de transaction de Wallet
+Evolution	#6197: Option WALLET_A
+Evolution	#6196: Type de clé MWK
+Evolution	#6195: Classe de clé HMAC SHA2
+
+Evolution	#6398:	Limitation des possibilités  de transchiffrement dans la commande FF46
+Evolution	#6377:	Support du HMAC Bancontact MisterCash
+Evolution	#6376:	Protection contre les oracles de padding
+Evolution	#6375:	dCVV2 VISA et TVV V0.4 GCB
+Evolution	#6359:	La commande FF816B est retirée de la version "CB"
+Evolution	#6297:	Signature des logiciels pour crypt2pay XT en SHA256 uniquement
+Evolution	#6296:	Format des fichiers chiffrés pour crypt2pay XT (CHR V006/A)
+Evolution	#6283:	Profil DSS
+Evolution	#6282:	Création de l'option HCE_DTS
+Evolution	#6250:	Interface mailbox pour gestion du LCD
+Evolution	#6206:	retrait de l'option ANSI2 du profil AUTH
+Evolution	#6199:	Retrait de l'option MONEO_DataPrep du profile DATAPREP
+
+Corrections
+-----------
+Anomalie	#6402:	Commande calcul de CVX2 non autorisée pour l'option HCE_DTS
+Anomalie	#6315:	Certificat serveur n'est pas restauré dans certains cas
+Anomalie	#6213:	Possible d'ouvrir plusieurs connexions crypto sans avoir coché l'option MULTI_C
+
+
+
+
+  #########################
+  # dstr.bnt.in-V1201-04I #
+  #########################
+
+Création : Jun 10 2016, 16:51:09
+Révision : 13560
+
+SHA1:      B087BE83 9765EA89 AF06C923 5D9CACF3 54C4FD2B
+SHA256:    5D5BE2F7 7DEAD487 AEDF0A1C DE8B3F5E 
+           83DD5C62 8CBA615B 3B95A0EC 6872B1DC
+
+Spécifications 12.01.04 (27 mai 2016)
+
+Évolutions
+----------
+Evolution #6285: Clé KSKI
+Evolution #6288: Commande d'importation de clé de device
+Evolution #6293: longueur minimale des clés KICC passe de 512 à 1024 bits
+Evolution #6318: Ajout d'une clé d'autorité de certification ECDSA
+Evolution #6323: Génération de l'IDN pour le Cloud Based Payment Mastercard
+Evolution #6339: Transcodage des données dans la commande de chiffrement des données de sortie
+Evolution #6351: Fourniture en sortie du prochain compteur dans la commande FF 82 2F
+
+Corrections
+-----------
+Anomalie #6286: Clé KSKI remplace KSImp dans la commande FF8226
+Anomalie #6348: controle abusif de la taille des données dans le calcul de MAC avec des clés MOBSKM
+Anomalie #6350: Non initialisation de l'IV en mode CTR
+Anomalie #6352: Padding du format ISO4
+Anomalie #6360: La clé KTOK ne supporte pas les modes d'usage GCM et AES_KEYWRAP
+
+
+
+  #########################
+  # dstr.bnt.in-V1201-03I #
+  #########################
+
+Création : Mar 30 2016, 18:11:39
+Révision : 13445
+
+SHA1:      D442FA43 1E377DCE 59D09399 D76D5840 5498F9A5
+SHA256:    01958235 83667068 3808EF99 353BAD35
+           CC53A33E 00326E98 79AF9729 1AB9C4DE
+
+Spécifications 12.01.02 (21 mars 2016)
+
+Évolutions
+----------
+Evolution #5647: Algorithme Chine UnionPay
+Evolution #5648: Seconde passerelle dédiée à la deuxième interface
+Evolution #5718: Clés de transport de PIN AES 192 et 256
+Evolution #5828: Clés de transport de PIN en 3DES (192 bits)
+Evolution #5918: Signature ISO9796-2 Schéma1 Option 1
+Evolution #5982: Initialisation de la chaine de personnalisation du DRBG
+Evolution #5985: Dérivation des clés CPS2Ter dans la commande de secure channel IAS ECC
+Evolution #6120: Authentification de signataire avec des données d'authentification courtes
+Evolution #6123: Commande de déchiffrement des données de l'Application Mobile
+Evolution #6124: Protection des données chiffrées pour l'Application Mobile
+Evolution #6125: Transchiiffrement des données du profil de carte de KTEK vers CPSK
+Evolution #6126: Génération des clés SUK à partir des clés de session
+Evolution #6127: Clé éphémère secrète fournie chiffrée sous clés RSA
+Evolution #6128: Clé de chiffrement du PIN Mobile
+Evolution #6129: Commande de Contrôle de PIN Mobile
+Evolution #6137: Blocage des clés soumises à activation dans la commande de déchiffrement RSA
+Evolution #6139: Usage de la clé MOBKC
+Evolution #6152: Performances RSA sur CHR V005
+Evolution #6166: Test des ressources FPGA
+Evolution #6170: Option HCE_CMS en mode d'opération PCI
+
+Interface d'administration
+--------------------------
+Evolution #5720: Chargement des clés à partir de l'interface d'admin
+
+Corrections
+-----------
+Anomalie #5936: Contrôle de la validité des dates dans les jetons de clés asymétrique
+Anomalie #6030: Clé KTK de classe AES non supporté dans la commande de génération de clé de session APACS
+Anomalie #6073: Blocage réseau sous forte charge CRYPTOs et HTTPs
+Anomalie #6122: Les jetons de clef publique certifiée contenant un mode d'usage ne sont pas acceptés par le HSM
+Anomalie #6147: Autorisation du tirage de DKEK en dehors du contexte CGDCng
+Anomalie #6204: Corruption mémoire en forte charge et avec plusieurs connexions SSL/TLS
+Anomalie #6207: Fuite mémoire après ouverture d'une connexion cryptos TLS
+Anomalie #6219: La communication avec le PIC peut rester bloquée indéfiniment
+
+
+
+  #########################
+  # dstr.bnt.in-V1201-02I #
+  #########################
+
+Création : Nov 6 2015, 08:38:40
+SHA1:      EC2F1093 A412A87F DD8E00C6 9E2E3447 5DDA4D16
+SHA256:    D800E44F AA6489D8 C653001D 6670E8E0
+           0732152E 3534086C 06D8AF26 03917822
+
+Évolutions
+----------
+
+Spécifications 12.1 (partielles) :
+
+- Nouveaux types de clef MKLORA et DKEK (RM #5919)
+- Nouvelle option LORA (RM #5920) et les cinq commandes correspondantes
+  (RM #5922, #5923, #5924, #5925, #5974 et #5984)
+- Nouveau profil HCE (RM #5971)
+- L'option HCE_TMS autorise désormais les commandes de calcul de CVX2,
+  de vérification d'AC et de calcul d'ARPC (RM #5972)
+- La clef de session devient obligatoire pour un calcul d'ARPC en CVN43
+  (RM #5973)
+- La commande de vérification de CVx consulte et renseigne désormais la liste
+  orange dans le cas des clefs IMKtvv (RM #5780)
+- La commande de tirage de clef dynamique permet le chiffrement en AES Keywrap
+  (si la clef de chiffrement est de classe AES, bien évidemment) (RM #5887)
+- Les 21 courbes elliptiques spécifiées dans ANSI X.9-62 sont désormais
+  acceptées et utilisables, à la place du sous-ensemble de 15 courbes
+  utilisé précéemment. (RM #5862)
+
+Corrections
+-----------
+
+- La commande de tirage de clef symétrique n'était pas utilisable dans
+  la version V806-11. (RM #5866)
+- La commande de vérification de CVX utilisée avec l'algorithme VISA et
+  une clef IMKcvc3 ou IMKtvv provoquait l'insertion d'un PAN incorrect
+  en liste orange en cas d'échec. Il s'agit là d'une régression affectant
+  toutes les versions V806 <= V806-11. (RM #5983)
+- La commande de changement de pin ne vérifiait pas correctement l'égalité
+  entre l'IdP de clef IMK et le début de l'IdC de la clef KT lors d'un
+  changement de propriétaire. (RM #5903)
+- Dans le cas où la commande de tirage de clef dynamique était utilisée avec
+  une clef de chiffrement KME ou KTK de classe AES, celle-ci était traitée
+  comme une clef DES pour le chiffrement (mais le contrôle du niveau de
+  sécurité des clefs était effectué correctement). Le tirage de clef
+  statique n'était pas sujet à ce problème. (RM #5889)
+
+Interface d'administration
+--------------------------
+
+- Il est désormais possible de restreindre les protocoles SSL/TLS acceptés
+  par C2P depuis la page de configuration réseau. Le réglage est global
+  et affecte aussi bien les connexions à l'interface d'administration en
+  https, que les connexion cryptographiques sur le port 3001. ATTENTION !
+  il n'y a pas encore de garde-fou, il est donc possible de « s'enfermer
+  dehors » si l'accès non chiffré (http) est désactivé et que les seules
+  versions de protocole TLS autorisées ne sont pas supportées par le
+  navigateur utilisé. (RM #5171)
+- Il est désormais possible de charger des certificats d'AC pour l'export des
+  clefs. Ceux-ci ne sont jamais utilisés pour les connexions chiffrées.
+  (RM #5921)
+
+
+  ########################
+  # dstr.bnt.in-V806-11I #
+  ########################
+
+Création : Sep 25 2015, 08:50:44
+SHA1:      1F780503 5EBA6DBF E9E04CC7 591CCE8B CC3025DF
+SHA256:    EE81360D 64B3E81E 76FB1AA2 6AFB8698
+           D9919122 547839A5 44CC6234 3949FD7F
+
+Évolution
+---------
+
+- Les 21 courbes elliptiques spécifiées dans ANSI X.9-62 sont désormais
+  acceptées et utilisables, à la place du sous-ensemble de 15 courbes
+  utilisé précéemment. (RM #5862)
+
+
+  ########################
+  # dstr.bnt.in-V806-09I #
+  ########################
+
+Création : Apr 14 2015, 15:07:49
+SHA1:      91F906B4 2C58AB33 7B19FF3C 41842F61 8ED199E5
+SHA256:    CDB1D94E F98CBE8E 0C9CC96A 099C5181
+           B2AC72B1 2B804BA9 039BCE87 5E12CDA1
+
+Corrections
+-----------
+
+- Corrections du traitement de l'authentification des utilisateurs de la base
+  de clefs:
+  + La commande d'authentification externe provoquait une fuite mémoire dans
+    la partition système (RM #5418).
+  + L'échec d'authentification utilisateur conservait l'authentification
+    existente au lieu de revenir en état « non authentifié » (RM #5419).
+  + Une clef USER sans mot de passe défini pouvait être utilisée pour
+    s'authentifier sans mot de passe. (RM #5420)
+
+- Plusieurs commandes cryptographiques ne se comportaient pas correctement
+  (coupure de la connexion + trace d'exception dans le log) dans certains
+  cas d'utilisation de clefs AES avec des données à traiter (vecteurs de
+  contrôle, KEV, données à reporter, etc) d'une taille multiple de 8 octets
+  mais non multiple de 16 octets, qui auraient dû être rejetés. C'est le cas
+  des commandes FF45, FF4B, FF9122, FF8129, FF8202 et FF8203. (RM #5393)
+
+- La conversion d'un pin block dont le code confidentiel est de longueur
+  impaire, vers le format ISO1, détruisait la valeur du dernier digit dudit
+  code confidentiel. (RM #5452)
+
+- Le tirage d'une clef éphémère de plus de 4000 bits dans le cadre du
+  protocole SSL/TLS n'aboutissait pas. (RM #5476)
+
+- La commande de vérification de MAC avec clef dérivée GrDF (FF8220)
+  n'acceptait la valeur 15 pour le choix de variante (tag DF 82 62). (RM #5581)
+
+Évolutions
+----------
+
+- Spécifications 11.6 (partielles) :
+  + Support des algorithmes CVC3 UMD et CVC3 MD dans la commande de
+    vérification de CVC3 (Mastercard Cloud-Based Payment) (RM #5423)
+  + Nouvelle option HCE_CMS (mais toutes les fonctionnalités HCE_CMS ne sont
+    pas encore disponibles) (RM #5440)
+  + Nouvelle commande de génération de clef à usage limité FF8228 (RM #5447)
+
+- Interface d'administration :
+  + Un nouvelle page de statistiques est ajoutée à l'interface ; celle-ci
+    présente, pour chaque commande cryptographique, les temps de traitement
+    extrêmes ainsi que le temps de traitement moyen, et donne la possibilité
+    de réinitialiser les statistiques, commande par commande.
+  + L'affichage des compteurs de vérification de code est déplacé de la page
+    "outils" vers la page "statistiques".
+
+
+  ########################
+  # dstr.bnt.in-V806-08I #
+  ########################
+
+Création : Jan 5 2015, 08:40:58
+SHA1:      7B6503E9 9599A10C 6016EE9B 3C2A0C76 8AFD7976
+SHA256:    573A49FE 4C3B77FB 95ED4F1E E57533CD
+           AEC4483B D53BCC90 B409FBF1 DA64427C
+           
+Évolutions
+----------
+
+- Spécifications 11.5, dont :
+  + La commande d'exportation de clef initiale de terminale supporte désormais
+    l'export sous clef publique RSA (RM #5298)
+  + Nouvelle commande de calcul d'AC avec l'algorithme VISA CVN10 (FF 82 24)
+    (RM #5280).
+  + Support de l'algorithme VISA CVN43 dans les commandes de vérification
+    d'AC et de calcul d'ARPC (RM #5217).
+  + Le tag DF 82 5F (données d'activation) de la commande de tirage de clef
+    RSA est retiré du périmètre de la version « CB » et n'est plus autorisé
+    (RM #5199).
+  + Le transchiffrement de KM2bntx de KDKM vers KDKM est désormais possible
+    (RM #5180).
+  + Le transchiffrement de code confidentiel est désormais possible de
+    KTukpt vers KTukpt (RM #5317).
+
+Corrections
+-----------
+
+- Par souci de confidentialité, les traces des échanges protocolaires C2P
+  sont automatiquement désactivées lorsque l'une ou l'autre des options
+  privatives GRDF_SIAS et GRDF_FAB est active, et que l'option TEST n'est
+  pas active (RM #5290).
+
+
+  #######################
+  # dstr.bnt.in-V806-07I #
+  #######################
+
+Création : Nov 17 2014, 09:14:11
+SHA1:      C963EEB9 B3FB429F 2BD21157 67E94CA1 CEDE9229
+SHA256:    AFAA3D2C DAB55C75 132B678E 6CFC11EF
+           D1CDCC68 38539EB5 5A2CB2A8 024A037E
+
+Évolutions
+----------
+
+- La dérivation DUKPT est désormais possible avec des clefs de dérivation KSC
+  et KDukpt (RM #5176)
+- La commande de calcul de sceau accepte une longueur de données inférieure à
+  la taille du bloc de chiffrement dans le cas des clefs KSC et SKUmac
+  (RM #5156)
+
+Corrections
+-----------
+
+- La valeur initiale du compteur dans les commandes GRDF (FF 82 20, FF 82 21,
+  FF 82 22) était 00 00 00 01 au lieu de 00 00 00 00 (RM #5182)
+- La réalisation d'un chiffrement authentifié avec clef symétrique (commande
+  FF 82 0B) donnait des résultats incorrects dans le cas où le calcul est
+  effectué en plusieurs étapes (start, continue, stop). Seul le calcul
+  réalisé en mode "once" s'avérait exact (RM #5086)
+
+  ########################
+  # dstr.bnt.in-V806-06I #
+  ########################
+
+Création : Sep 19 2014, 16:05:58 
+SHA1:      AD5F 9B55 CA9C 3274 E67C 6C6A DD85 4DB6 0E30 3F11
+SHA256:    F9A5 3124 7FD8 4659 112C EB82 7C69 8BB6 
+           E1BF 3243 D9D9 737E 9EE8 5B1D 383C 2719 
+
+
+Aucun changement, alignement du numero de version sur chr.bnt.in-V806-06I.
+
+  ########################
+  # dstr.bnt.in-V806-05I #
+  ########################
+
+Création : Sep 4 2014, 12:53:03 
+SHA1:      104B 0603 1F39 71F7 E5D1 25D4 04D8 12B9 8F75 62D1
+SHA256:    B42D F643 5E4B 24E4 B27A E46B B2D3 38D4
+           7449 7647 82BA 72B1 6B91 AC0A 2AC5 04CA
+
+Première diffusion officielle. Correspond à l'état technique V806-05I.
