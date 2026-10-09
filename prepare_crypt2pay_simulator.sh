@@ -10,6 +10,9 @@ CRYPT2PAY_SIM_PID_FILE="${CRYPT2PAY_SIM_PID_FILE:-/tmp/crypt2pay-sim.pid}"
 CRYPT2PAY_SIM_ADMIN_LOGIN="${CRYPT2PAY_SIM_ADMIN_LOGIN:-admin}"
 CRYPT2PAY_SIM_ADMIN_PASSWORD="${CRYPT2PAY_SIM_ADMIN_PASSWORD:-root}"
 CRYPT2PAY_SIM_CLIENT_P12_PASSWORD="${CRYPT2PAY_SIM_CLIENT_P12_PASSWORD:-Test20250128}"
+# Appliance default is 1 concurrent crypto connection; raise it so p11tool checks
+# and the KMS process don't get refused once they overlap.
+CRYPT2PAY_SIM_MAXCON="${CRYPT2PAY_SIM_MAXCON:-8}"
 
 killall -9 bnt || true
 
@@ -59,6 +62,26 @@ wait_for_port "$CRYPT2PAY_SIM_ADMIN_PORT"
 CRYPT2PAY_SIM_COOKIES="$(mktemp)"
 curl -sf -c "$CRYPT2PAY_SIM_COOKIES" -X POST "${CRYPT2PAY_SIM_ADMIN_URL}/login.cgi" \
   -d "referer=/" -d "do=yes" -d "login=${CRYPT2PAY_SIM_ADMIN_LOGIN}" -d "passwd=${CRYPT2PAY_SIM_ADMIN_PASSWORD}" -o /dev/null
+
+# Crypto connection parameters default to maxcon=1; a second concurrent
+# connection is refused at the application layer ("refused secure connection").
+# This form rejects a partial submission (e.g. "Cannot change SSL/TLS protocol
+# setting" if tls13/tls12 are omitted), so fetch the current values and
+# resubmit every field unchanged except maxcon.
+CRYPT2PAY_SIM_TCPIP_HTML="$(curl -sf -b "$CRYPT2PAY_SIM_COOKIES" "${CRYPT2PAY_SIM_ADMIN_URL}/en/syst_tcpip")"
+tcpip_value() { grep -oP "name=\"$1\"[^>]*value=\"\K[^\"]*" <<<"$CRYPT2PAY_SIM_TCPIP_HTML" | head -1; }
+tcpip_checked() { printf '%s' "$CRYPT2PAY_SIM_TCPIP_HTML" | grep -Pzoq "name=\"$1\"[\s\S]*?checked"; }
+CRYPT2PAY_SIM_TCPIP_ARGS=(-d do=yes)
+for f in addr0_0 addr0_1 addr0_2 addr0_3 mask0_0 mask0_1 mask0_2 mask0_3 dgw_0 dgw_1 dgw_2 dgw_3; do
+  CRYPT2PAY_SIM_TCPIP_ARGS+=(-d "${f}=$(tcpip_value "$f")")
+done
+CRYPT2PAY_SIM_SSL_AUTH="$(grep -Pzo '(?s)<select name="ssl_tls_auth">.*?</select>' <<<"$CRYPT2PAY_SIM_TCPIP_HTML" | tr -d '\0' | grep -oP 'value="\K[0-9]+(?=" selected)')" || true
+CRYPT2PAY_SIM_TCPIP_ARGS+=(-d "ssl_tls_auth=${CRYPT2PAY_SIM_SSL_AUTH}")
+if tcpip_checked tls13; then CRYPT2PAY_SIM_TCPIP_ARGS+=(-d tls13=on); fi
+if tcpip_checked tls12; then CRYPT2PAY_SIM_TCPIP_ARGS+=(-d tls12=on); fi
+CRYPT2PAY_SIM_TCPIP_ARGS+=(-d "maxcon=${CRYPT2PAY_SIM_MAXCON}" -d "Valider= Submit ")
+curl -sf -b "$CRYPT2PAY_SIM_COOKIES" -X POST "${CRYPT2PAY_SIM_ADMIN_URL}/en/syst_tcpip.cgi" \
+  "${CRYPT2PAY_SIM_TCPIP_ARGS[@]}" -o /dev/null
 
 curl -sf -b "$CRYPT2PAY_SIM_COOKIES" -X POST "${CRYPT2PAY_SIM_ADMIN_URL}/en/appli_option.cgi" \
   -d "do=yes" -d "basic=on" -d "encrypt=on" -d "multi_c=on" -d "pkcs11=on" -d "test=on" \
