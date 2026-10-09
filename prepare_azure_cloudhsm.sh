@@ -45,11 +45,17 @@ write_po_certificate() {
 }
 
 # azcloudhsm_resource.cfg must point at the partition's Private Link FQDN
-# (hsm1.chsm-<resourcename>-<uniquestring>.privatelink.cloudhsm.azure.net).
+# (hsm1.chsm-<resourcename>-<uniquestring>.privatelink.cloudhsm.azure.net), but
+# that zone only resolves through Azure's VNet-linked private DNS: an external
+# VPN client has no route to that resolver, and the azcloudhsm_client's own
+# lookup bypasses /etc/hosts. When AZURE_CLOUD_HSM_HSM_IP is known, write the
+# literal IP instead — getaddrinfo() short-circuits on a numeric address, so
+# this sidesteps DNS resolution entirely.
 write_resource_config() {
   : "${AZURE_CLOUD_HSM_HOSTNAME:?AZURE_CLOUD_HSM_HOSTNAME is required}"
   require_command sudo
-  printf '{\n    "servers": [\n    {\n        "hostname" : "%s"\n    }]\n}\n' "${AZURE_CLOUD_HSM_HOSTNAME}" |
+  local server_address="${AZURE_CLOUD_HSM_HSM_IP:-${AZURE_CLOUD_HSM_HOSTNAME}}"
+  printf '{\n    "servers": [\n    {\n        "hostname" : "%s"\n    }]\n}\n' "${server_address}" |
     sudo tee "${AZURE_CLOUD_HSM_BIN_DIR}/azcloudhsm_resource.cfg" >/dev/null
 }
 
