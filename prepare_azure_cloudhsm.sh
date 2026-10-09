@@ -119,7 +119,11 @@ maybe_start_azure_cloud_hsm_vpn() {
 }
 
 # The PKCS#11 library talks to azcloudhsm_client over a local socket; without
-# this daemon running, C_Initialize fails with a connection error.
+# this daemon running, C_Initialize fails with a connection error. The daemon
+# process can exist (pgrep succeeds) before it has finished its own E2E
+# handshake with every HSM node in the cluster; wait for that log line too,
+# not just the process, to avoid a race against the PKCS#11 test's
+# C_Initialize call (observed as CKR_GENERAL_ERROR when too eager).
 start_azure_cloud_hsm_client_daemon() {
   require_command sudo
   if pgrep -f "azcloudhsm_client" >/dev/null 2>&1; then
@@ -130,13 +134,26 @@ start_azure_cloud_hsm_client_daemon() {
   (cd "${AZURE_CLOUD_HSM_BIN_DIR}" && sudo ./azcloudhsm_client azcloudhsm_resource.cfg >/tmp/azcloudhsm_client.log 2>&1 &)
   for _ in $(seq 1 20); do
     if pgrep -f "azcloudhsm_client" >/dev/null 2>&1; then
+      break
+    fi
+    sleep 1
+  done
+  if ! pgrep -f "azcloudhsm_client" >/dev/null 2>&1; then
+    echo "ERROR: azcloudhsm_client daemon did not start" >&2
+    cat /tmp/azcloudhsm_client.log >&2 2>/dev/null || true
+    exit 1
+  fi
+
+  for _ in $(seq 1 20); do
+    if grep -qi "E2E enabled\|session.*established\|ready" /tmp/azcloudhsm_client.log 2>/dev/null; then
       return 0
     fi
     sleep 1
   done
-  echo "ERROR: azcloudhsm_client daemon did not start" >&2
-  cat /tmp/azcloudhsm_client.log >&2 2>/dev/null || true
-  exit 1
+  # No explicit readiness marker found in the log within the window: fall back
+  # to a short grace period rather than failing, since the exact log wording
+  # is not guaranteed across SDK versions.
+  sleep 5
 }
 
 : "${HSM_USER_PASSWORD:?HSM_USER_PASSWORD is required (format <user>:<password>)}"
