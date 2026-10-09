@@ -69,6 +69,11 @@ maybe_map_hostname_to_ip() {
   fi
 }
 
+# The Azure Cloud HSM client/management protocol listens on 2225 (confirmed via
+# azcloudhsm_mgmt_util: "Connecting to 'server 0': hostname '<ip>', port 2225");
+# it is not an HTTPS endpoint, so 443 is never open on the HSM nodes.
+AZURE_CLOUD_HSM_PORT="${AZURE_CLOUD_HSM_PORT:-2225}"
+
 # GitHub-hosted runners have no route to the HSM's private VNet IP; start a VPN
 # tunnel when direct reachability fails, mirroring AWS CloudHSM's
 # maybe_start_cloudhsm_vpn in prepare_aws_cloudhsm.sh.
@@ -77,12 +82,12 @@ maybe_start_azure_cloud_hsm_vpn() {
     return 0
   fi
 
-  if timeout 5 bash -c "echo >/dev/tcp/${AZURE_CLOUD_HSM_HSM_IP}/443" 2>/dev/null; then
+  if timeout 5 bash -c "echo >/dev/tcp/${AZURE_CLOUD_HSM_HSM_IP}/${AZURE_CLOUD_HSM_PORT}" 2>/dev/null; then
     return 0
   fi
 
   if [ -z "${AZURE_CLOUD_HSM_OVPN_CONF:-}" ]; then
-    echo "ERROR: HSM ${AZURE_CLOUD_HSM_HSM_IP}:443 is not reachable and AZURE_CLOUD_HSM_OVPN_CONF is not set" >&2
+    echo "ERROR: HSM ${AZURE_CLOUD_HSM_HSM_IP}:${AZURE_CLOUD_HSM_PORT} is not reachable and AZURE_CLOUD_HSM_OVPN_CONF is not set" >&2
     exit 1
   fi
 
@@ -94,14 +99,14 @@ maybe_start_azure_cloud_hsm_vpn() {
   sudo "${openvpn_bin}" --config "${AZURE_CLOUD_HSM_OPENVPN_CONF_FILE}" \
     --daemon --writepid "${AZURE_CLOUD_HSM_OPENVPN_PID_FILE}" --log "${AZURE_CLOUD_HSM_OPENVPN_LOG_FILE}"
 
-  for _ in $(seq 1 30); do
-    if timeout 5 bash -c "echo >/dev/tcp/${AZURE_CLOUD_HSM_HSM_IP}/443" 2>/dev/null; then
+  for _ in $(seq 1 60); do
+    if timeout 5 bash -c "echo >/dev/tcp/${AZURE_CLOUD_HSM_HSM_IP}/${AZURE_CLOUD_HSM_PORT}" 2>/dev/null; then
       return 0
     fi
     sleep 1
   done
 
-  echo "ERROR: HSM ${AZURE_CLOUD_HSM_HSM_IP}:443 still unreachable after starting the VPN tunnel" >&2
+  echo "ERROR: HSM ${AZURE_CLOUD_HSM_HSM_IP}:${AZURE_CLOUD_HSM_PORT} still unreachable after starting the VPN tunnel" >&2
   sudo cat "${AZURE_CLOUD_HSM_OPENVPN_LOG_FILE}" >&2 ||
     echo "(no openvpn log found at ${AZURE_CLOUD_HSM_OPENVPN_LOG_FILE})" >&2
   exit 1
