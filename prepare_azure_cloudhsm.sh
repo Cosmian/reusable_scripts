@@ -49,7 +49,7 @@ write_po_certificate() {
 write_resource_config() {
   : "${AZURE_CLOUD_HSM_HOSTNAME:?AZURE_CLOUD_HSM_HOSTNAME is required}"
   require_command sudo
-  printf 'hostname=%s\n' "${AZURE_CLOUD_HSM_HOSTNAME}" |
+  printf '{\n    "servers": [\n    {\n        "hostname" : "%s"\n    }]\n}\n' "${AZURE_CLOUD_HSM_HOSTNAME}" |
     sudo tee "${AZURE_CLOUD_HSM_BIN_DIR}/azcloudhsm_resource.cfg" >/dev/null
 }
 
