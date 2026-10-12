@@ -4,6 +4,10 @@ set -euo pipefail
 AZURE_CLOUD_HSM_SDK_VERSION="${AZURE_CLOUD_HSM_SDK_VERSION:-2.0.2.5}"
 AZURE_CLOUD_HSM_SDK_DEB_URL="${AZURE_CLOUD_HSM_SDK_DEB_URL:-https://github.com/microsoft/MicrosoftAzureCloudHSM/releases/download/AzureCloudHSM-ClientSDK-${AZURE_CLOUD_HSM_SDK_VERSION}/AzureCloudHSM-ClientSDK-OpenSSL3-${AZURE_CLOUD_HSM_SDK_VERSION}.deb}"
 AZURE_CLOUD_HSM_BIN_DIR="${AZURE_CLOUD_HSM_BIN_DIR:-/opt/azurecloudhsm/bin}"
+# Where the shipped azcloudhsm_client.cfg's "e2e_owner_crt_path" expects PO.crt to live;
+# writing it under AZURE_CLOUD_HSM_BIN_DIR instead leaves the client daemon unable to
+# validate the E2E owner certificate, so C_Initialize later fails with CKR_GENERAL_ERROR.
+AZURE_CLOUD_HSM_CERT_DIR="${AZURE_CLOUD_HSM_CERT_DIR:-/opt/azurecloudhsm/cert}"
 AZURE_CLOUD_HSM_PKCS11_LIB="${AZURE_CLOUD_HSM_PKCS11_LIB:-/opt/azurecloudhsm/lib64/libazcloudhsm_pkcs11.so}"
 
 require_command() {
@@ -40,8 +44,8 @@ install_azure_cloud_hsm_client() {
 write_po_certificate() {
   : "${AZURE_CLOUD_HSM_PO_CERT:?AZURE_CLOUD_HSM_PO_CERT is required}"
   require_command sudo
-  printf '%s\n' "${AZURE_CLOUD_HSM_PO_CERT}" | sudo tee "${AZURE_CLOUD_HSM_BIN_DIR}/PO.crt" >/dev/null
-  sudo chmod 0644 "${AZURE_CLOUD_HSM_BIN_DIR}/PO.crt"
+  printf '%s\n' "${AZURE_CLOUD_HSM_PO_CERT}" | sudo tee "${AZURE_CLOUD_HSM_CERT_DIR}/PO.crt" >/dev/null
+  sudo chmod 0644 "${AZURE_CLOUD_HSM_CERT_DIR}/PO.crt"
 }
 
 # azcloudhsm_resource.cfg must point at the partition's Private Link FQDN
