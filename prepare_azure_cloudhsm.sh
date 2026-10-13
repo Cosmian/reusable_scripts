@@ -209,7 +209,10 @@ start_azure_cloud_hsm_client_daemon() {
   fi
 
   for _ in $(seq 1 30); do
-    if [ "$(grep -ci "E2E enabled" /tmp/azcloudhsm_client.log 2>/dev/null || echo 0)" -ge "${AZURE_CLOUD_HSM_CLUSTER_SIZE}" ]; then
+    local enabled_count
+    enabled_count="$(grep -ci "E2E enabled" /tmp/azcloudhsm_client.log 2>/dev/null || true)"
+    enabled_count="${enabled_count:-0}"
+    if [ "${enabled_count}" -ge "${AZURE_CLOUD_HSM_CLUSTER_SIZE}" ]; then
       return 0
     fi
     sleep 1
