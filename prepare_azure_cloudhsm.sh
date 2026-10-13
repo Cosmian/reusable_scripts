@@ -84,6 +84,19 @@ maybe_map_hostname_to_ip() {
 # it is not an HTTPS endpoint, so 443 is never open on the HSM nodes.
 AZURE_CLOUD_HSM_PORT="${AZURE_CLOUD_HSM_PORT:-2225}"
 
+# The daemon-to-server data-plane protocol (distinct from the 2225 mgmt port
+# above) listens on 2224. It matters here because, once logged in to the
+# primary node, azcloudhsm_client learns the other cluster nodes' addresses
+# from the primary's own topology reply and dials each one *directly by IP*
+# on this port — it does not go through azcloudhsm_resource.cfg or
+# /etc/hosts for those sibling nodes. If the VPN/route only reaches the one
+# IP the daemon was handed, the siblings are unreachable: the log fills with
+# "daemontoserver network error, closing conn." reconnect loops, and any
+# operation requiring cluster quorum (e.g. C_GenerateKeyPair) fails with
+# "[create_object_min_nodes] Required number of servers(3) not available",
+# surfaced to PKCS#11 callers as a bare CKR_FUNCTION_FAILED.
+AZURE_CLOUD_HSM_DATA_PORT="${AZURE_CLOUD_HSM_DATA_PORT:-2224}"
+
 # GitHub-hosted runners have no route to the HSM's private VNet IP; start a VPN
 # tunnel when direct reachability fails, mirroring AWS CloudHSM's
 # maybe_start_cloudhsm_vpn in prepare_aws_cloudhsm.sh.
@@ -120,6 +133,31 @@ maybe_start_azure_cloud_hsm_vpn() {
   sudo cat "${AZURE_CLOUD_HSM_OPENVPN_LOG_FILE}" >&2 ||
     echo "(no openvpn log found at ${AZURE_CLOUD_HSM_OPENVPN_LOG_FILE})" >&2
   exit 1
+}
+
+# Fails fast with a precise, actionable diagnostic instead of letting the
+# daemon silently reconnect-loop and the test fail deep inside
+# C_GenerateKeyPair with a bare CKR_FUNCTION_FAILED. Set
+# AZURE_CLOUD_HSM_HSM_IPS to a space-separated list of every cluster node's
+# private IP (not just the one in AZURE_CLOUD_HSM_HSM_IP/HOSTNAME) — find
+# them via `azcloudhsm_mgmt_util` `listServers`, or in /tmp/azcloudhsm_client.log
+# reconnect lines, once the VPN route covers the whole HSM subnet.
+verify_azure_cloud_hsm_cluster_reachable() {
+  if [ -z "${AZURE_CLOUD_HSM_HSM_IPS:-}" ]; then
+    return 0
+  fi
+  local unreachable=()
+  local ip
+  for ip in ${AZURE_CLOUD_HSM_HSM_IPS}; do
+    if ! timeout 5 bash -c "echo >/dev/tcp/${ip}/${AZURE_CLOUD_HSM_DATA_PORT}" 2>/dev/null; then
+      unreachable+=("${ip}")
+    fi
+  done
+  if [ ${#unreachable[@]} -gt 0 ]; then
+    echo "ERROR: ${#unreachable[@]} Azure Cloud HSM cluster node(s) unreachable on port ${AZURE_CLOUD_HSM_DATA_PORT}: ${unreachable[*]}" >&2
+    echo "Cluster operations (e.g. key generation) require quorum across all nodes; widen the VPN route/NSG to cover these private IPs." >&2
+    exit 1
+  fi
 }
 
 # The PKCS#11 library talks to azcloudhsm_client over a local socket; without
@@ -182,6 +220,7 @@ write_po_certificate
 write_resource_config
 maybe_map_hostname_to_ip
 maybe_start_azure_cloud_hsm_vpn
+verify_azure_cloud_hsm_cluster_reachable
 start_azure_cloud_hsm_client_daemon
 
 export AZURE_CLOUD_HSM_PKCS11_LIB
