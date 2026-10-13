@@ -82,6 +82,11 @@ write_resource_config() {
   fi
   printf '{\n    "servers": [\n%b]\n}\n' "${servers_json}" |
     sudo tee "${AZURE_CLOUD_HSM_BIN_DIR}/azcloudhsm_resource.cfg" >/dev/null
+  # Values are masked by CI if they match a configured secret, but the entry
+  # count (brace/comma structure) still shows whether the multi-node branch
+  # above actually ran, which digit-masked log output elsewhere cannot confirm.
+  echo "--- azcloudhsm_resource.cfg (values may be masked) ---" >&2
+  sudo cat "${AZURE_CLOUD_HSM_BIN_DIR}/azcloudhsm_resource.cfg" >&2
 }
 
 AZURE_CLOUD_HSM_OPENVPN_PID_FILE="${AZURE_CLOUD_HSM_OPENVPN_PID_FILE:-/tmp/azure-cloudhsm-openvpn.pid}"
@@ -151,6 +156,7 @@ maybe_start_azure_cloud_hsm_vpn() {
 # VPN route already reaches for the primary node.
 verify_azure_cloud_hsm_cluster_reachable() {
   if [ -z "${AZURE_CLOUD_HSM_HSM_IPS:-}" ]; then
+    echo "AZURE_CLOUD_HSM_HSM_IPS not set: skipping multi-node reachability check" >&2
     return 0
   fi
   local unreachable=()
@@ -165,6 +171,7 @@ verify_azure_cloud_hsm_cluster_reachable() {
     echo "Cluster operations (e.g. key generation) require quorum across all nodes; widen the VPN route/NSG to cover these private IPs." >&2
     exit 1
   fi
+  echo "All configured Azure Cloud HSM cluster nodes reachable on port ${AZURE_CLOUD_HSM_PORT}" >&2
 }
 
 # The PKCS#11 library talks to azcloudhsm_client over a local socket; without
