@@ -128,6 +128,14 @@ maybe_start_azure_cloud_hsm_vpn() {
 # handshake with every HSM node in the cluster; wait for that log line too,
 # not just the process, to avoid a race against the PKCS#11 test's
 # C_Initialize call (observed as CKR_GENERAL_ERROR when too eager).
+#
+# A single readiness-marker match is not enough: the daemon logs one such
+# line per cluster node as it connects (confirmed via azcloudhsm_mgmt_util
+# against this cluster: "E2E enabled on server 0/1/2"), so matching on the
+# first occurrence lets the test start while nodes 1/2 are still syncing —
+# observed as an immediate (sub-second) CKR_FUNCTION_FAILED on the first
+# multi-node operation (e.g. C_GenerateKeyPair) once node 0 alone is ready.
+AZURE_CLOUD_HSM_CLUSTER_SIZE="${AZURE_CLOUD_HSM_CLUSTER_SIZE:-3}"
 start_azure_cloud_hsm_client_daemon() {
   require_command sudo
   if pgrep -f "azcloudhsm_client" >/dev/null 2>&1; then
@@ -148,16 +156,23 @@ start_azure_cloud_hsm_client_daemon() {
     exit 1
   fi
 
-  for _ in $(seq 1 20); do
-    if grep -qi "E2E enabled\|session.*established\|ready" /tmp/azcloudhsm_client.log 2>/dev/null; then
+  for _ in $(seq 1 30); do
+    if [ "$(grep -ci "E2E enabled" /tmp/azcloudhsm_client.log 2>/dev/null || echo 0)" -ge "${AZURE_CLOUD_HSM_CLUSTER_SIZE}" ]; then
       return 0
     fi
     sleep 1
   done
-  # No explicit readiness marker found in the log within the window: fall back
-  # to a short grace period rather than failing, since the exact log wording
-  # is not guaranteed across SDK versions.
-  sleep 5
+  # The expected per-node count was never reached within the window (e.g. the
+  # exact log wording differs across SDK versions): fall back to any single
+  # readiness marker plus a grace period, rather than failing outright.
+  for _ in $(seq 1 20); do
+    if grep -qi "E2E enabled\|session.*established\|ready" /tmp/azcloudhsm_client.log 2>/dev/null; then
+      sleep 10
+      return 0
+    fi
+    sleep 1
+  done
+  sleep 10
 }
 
 : "${HSM_USER_PASSWORD:?HSM_USER_PASSWORD is required (format <user>:<password>)}"
