@@ -69,7 +69,9 @@ write_po_certificate() {
 write_resource_config() {
   require_command sudo
   local servers_json=""
-  if [ -n "${AZURE_CLOUD_HSM_HSM_IPS:-}" ]; then
+  if [ -n "${AZURE_CLOUD_HSM_HOSTNAME:-}" ]; then
+    servers_json="    {\n        \"hostname\" : \"${AZURE_CLOUD_HSM_HOSTNAME}\"\n    }"
+  elif [ -n "${AZURE_CLOUD_HSM_HSM_IPS:-}" ]; then
     local ip
     for ip in ${AZURE_CLOUD_HSM_HSM_IPS}; do
       [ -n "${servers_json}" ] && servers_json+=",\n"
