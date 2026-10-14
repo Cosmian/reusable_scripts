@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ex
+set -e
 
 CRYPT2PAY_HOST="${CRYPT2PAY_HOST:-193.251.15.196}"
 CRYPT2PAY_PORT="${CRYPT2PAY_PORT:-3001}"
@@ -11,6 +11,7 @@ if [[ -n "${OVPN_CONF:-}" ]] && ! timeout 5 openssl s_client -connect "${CRYPT2P
   printf "%s\n" "$OVPN_CONF" > "$CRYPT2PAY_OPENVPN_CONF_FILE"
   sudo "$OPENVPN_BIN" --config "$CRYPT2PAY_OPENVPN_CONF_FILE" --daemon --writepid "$CRYPT2PAY_OPENVPN_PID_FILE"
 fi
+set -x
 
 wget -q https://package.cosmian.com/ci/hsm-crypt2pay.tar.gz
 tar -xzf hsm-crypt2pay.tar.gz
