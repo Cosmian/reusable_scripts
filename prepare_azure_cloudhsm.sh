@@ -213,6 +213,13 @@ start_azure_cloud_hsm_client_daemon() {
     enabled_count="$(grep -ci "E2E enabled" /tmp/azcloudhsm_client.log 2>/dev/null || true)"
     enabled_count="${enabled_count:-0}"
     if [ "${enabled_count}" -ge "${AZURE_CLOUD_HSM_CLUSTER_SIZE}" ]; then
+      # The "E2E enabled" marker per node confirms the transport handshake,
+      # but the daemon's internal slot/mechanism table can lag slightly
+      # behind it: observed as an immediate (sub-second) CKR_SLOT_ID_INVALID
+      # on the very first PKCS#11 call (C_GetMechanismList) even though all
+      # 3 nodes had already logged "E2E enabled". Apply the same grace
+      # period used by the fallback path below before declaring ready.
+      sleep 10
       return 0
     fi
     sleep 1
