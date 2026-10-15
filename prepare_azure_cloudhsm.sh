@@ -48,13 +48,30 @@ write_po_certificate() {
   sudo chmod 0644 "${AZURE_CLOUD_HSM_CERT_DIR}/PO.crt"
 }
 
-# azcloudhsm_resource.cfg must point at the partition's Private Link FQDN
-# (hsm1.chsm-<resourcename>-<uniquestring>.privatelink.cloudhsm.azure.net), but
-# that zone only resolves through Azure's VNet-linked private DNS: an external
-# VPN client has no route to that resolver, and the azcloudhsm_client's own
-# lookup bypasses /etc/hosts. When AZURE_CLOUD_HSM_HSM_IP is known, write the
-# literal IP instead — getaddrinfo() short-circuits on a numeric address, so
-# this sidesteps DNS resolution entirely.
+# Derives the per-node Private Link FQDN (hsm<index>.<same-suffix>) from the
+# primary AZURE_CLOUD_HSM_HOSTNAME (hsm1.<suffix>), since all nodes in one
+# cluster share the same <suffix> and only the leading "hsmN" alias differs —
+# confirmed against this cluster's own private DNS zone records (hsm1/hsm2/hsm3
+# all under the same "<cluster>-<uniquestring>.privatelink.cloudhsm.azure.net"
+# suffix). Falls back to the raw IP when no hostname is configured at all.
+cluster_node_hostname() {
+  local index="$1"
+  local ip="$2"
+  if [ -z "${AZURE_CLOUD_HSM_HOSTNAME:-}" ]; then
+    printf '%s' "${ip}"
+    return 0
+  fi
+  printf '%s' "${AZURE_CLOUD_HSM_HOSTNAME}" | sed -E "s/^hsm[0-9]+\./hsm${index}./"
+}
+
+# azcloudhsm_resource.cfg must point at each partition's Private Link FQDN
+# (hsm<N>.<cluster>-<uniquestring>.privatelink.cloudhsm.azure.net) rather than
+# a bare IP: azcloudhsm_mgmt_util only ever activated this cluster's 3 nodes
+# successfully when driven by that exact per-node hostname (see the
+# hsm_changepswd session transcript), never by raw IP. Resolution is handled
+# locally via /etc/hosts (maybe_map_hostname_to_ip below) since the
+# *.privatelink.cloudhsm.azure.net zone only resolves through Azure's
+# VNet-linked private DNS, which an external VPN client has no route to.
 #
 # A single "servers" entry is not enough: with only one node listed, the
 # client's own peer-discovery (triggered after login) hands back addresses
@@ -62,18 +79,22 @@ write_po_certificate() {
 # as an endless "daemontoserver network error, closing conn." reconnect loop
 # and "[create_object_min_nodes] Required number of servers(3) not available"
 # on every keypair generation. Set AZURE_CLOUD_HSM_HSM_IPS to all of the
-# cluster's private-endpoint IPs (one per approved alias hsm1/hsm2/hsm3 — list
-# them with `az network private-dns record-set a list --zone-name
-# privatelink.cloudhsm.azure.net`) so every node is listed explicitly instead
+# cluster's private-endpoint IPs, in hsm1/hsm2/hsm3 order (list them with
+# `az network private-dns record-set a list --zone-name
+# privatelink.cloudhsm.azure.net`), so every node is listed explicitly instead
 # of relying on that discovery step.
 write_resource_config() {
   require_command sudo
   local servers_json=""
   if [ -n "${AZURE_CLOUD_HSM_HSM_IPS:-}" ]; then
     local ip
+    local index=1
     for ip in ${AZURE_CLOUD_HSM_HSM_IPS}; do
+      local entry_hostname
+      entry_hostname="$(cluster_node_hostname "${index}" "${ip}")"
       [ -n "${servers_json}" ] && servers_json+=",\n"
-      servers_json+="    {\n        \"hostname\" : \"${ip}\"\n    }"
+      servers_json+="    {\n        \"hostname\" : \"${entry_hostname}\"\n    }"
+      index=$((index + 1))
     done
   else
     : "${AZURE_CLOUD_HSM_HOSTNAME:?AZURE_CLOUD_HSM_HOSTNAME is required}"
@@ -94,13 +115,29 @@ AZURE_CLOUD_HSM_OPENVPN_CONF_FILE="${AZURE_CLOUD_HSM_OPENVPN_CONF_FILE:-/tmp/azu
 AZURE_CLOUD_HSM_OPENVPN_LOG_FILE="${AZURE_CLOUD_HSM_OPENVPN_LOG_FILE:-/tmp/azure-cloudhsm-openvpn.log}"
 
 # The *.privatelink.cloudhsm.azure.net name only resolves inside the Azure VNet;
-# map it to the known private IP so the client daemon can dial it by hostname.
+# map every node's hostname (not just the primary one — write_resource_config
+# now writes a hostname per node) to its known private IP so the client daemon
+# can dial each one, since its own lookup bypasses /etc/hosts for names it
+# can't resolve otherwise.
 maybe_map_hostname_to_ip() {
-  if [ -z "${AZURE_CLOUD_HSM_HSM_IP:-}" ]; then
+  if [ -z "${AZURE_CLOUD_HSM_HOSTNAME:-}" ]; then
     return 0
   fi
   require_command sudo
-  if ! grep -q "${AZURE_CLOUD_HSM_HOSTNAME}" /etc/hosts 2>/dev/null; then
+  if [ -n "${AZURE_CLOUD_HSM_HSM_IPS:-}" ]; then
+    local ip
+    local index=1
+    for ip in ${AZURE_CLOUD_HSM_HSM_IPS}; do
+      local entry_hostname
+      entry_hostname="$(cluster_node_hostname "${index}" "${ip}")"
+      if ! grep -q "${entry_hostname}" /etc/hosts 2>/dev/null; then
+        printf '%s %s\n' "${ip}" "${entry_hostname}" | sudo tee -a /etc/hosts >/dev/null
+      fi
+      index=$((index + 1))
+    done
+    return 0
+  fi
+  if [ -n "${AZURE_CLOUD_HSM_HSM_IP:-}" ] && ! grep -q "${AZURE_CLOUD_HSM_HOSTNAME}" /etc/hosts 2>/dev/null; then
     printf '%s %s\n' "${AZURE_CLOUD_HSM_HSM_IP}" "${AZURE_CLOUD_HSM_HOSTNAME}" | sudo tee -a /etc/hosts >/dev/null
   fi
 }
