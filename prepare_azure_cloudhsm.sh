@@ -110,6 +110,16 @@ maybe_map_hostname_to_ip() {
 # it is not an HTTPS endpoint, so 443 is never open on the HSM nodes.
 AZURE_CLOUD_HSM_PORT="${AZURE_CLOUD_HSM_PORT:-2225}"
 
+# The daemon's inter-node "daemontoserver" cluster protocol (used to sync
+# membership/quorum after the initial handshake) listens on a separate port
+# from the client-facing 2225: confirmed via the daemon log's own
+# cluster_info_timeout broadcasts, e.g. "Cluster Info: server[<ip>],
+# port[2224], ... state[enabled]". A node can be reachable on 2225 yet refuse
+# 2224 (errno 111), which the client only discovers after claiming the
+# daemon is ready, deep inside a PKCS#11 call (CKR_SLOT_ID_INVALID /
+# CKR_FUNCTION_FAILED) — hence checking it explicitly up front below.
+AZURE_CLOUD_HSM_CLUSTER_PORT="${AZURE_CLOUD_HSM_CLUSTER_PORT:-2224}"
+
 # GitHub-hosted runners have no route to the HSM's private VNet IP; start a VPN
 # tunnel when direct reachability fails, mirroring AWS CloudHSM's
 # maybe_start_cloudhsm_vpn in prepare_aws_cloudhsm.sh.
@@ -160,10 +170,14 @@ verify_azure_cloud_hsm_cluster_reachable() {
     return 0
   fi
   local unreachable=()
+  local cluster_unreachable=()
   local ip
   for ip in ${AZURE_CLOUD_HSM_HSM_IPS}; do
     if ! timeout 5 bash -c "echo >/dev/tcp/${ip}/${AZURE_CLOUD_HSM_PORT}" 2>/dev/null; then
       unreachable+=("${ip}")
+    fi
+    if ! timeout 5 bash -c "echo >/dev/tcp/${ip}/${AZURE_CLOUD_HSM_CLUSTER_PORT}" 2>/dev/null; then
+      cluster_unreachable+=("${ip}")
     fi
   done
   if [ ${#unreachable[@]} -gt 0 ]; then
@@ -171,7 +185,12 @@ verify_azure_cloud_hsm_cluster_reachable() {
     echo "Cluster operations (e.g. key generation) require quorum across all nodes; widen the VPN route/NSG to cover these private IPs." >&2
     exit 1
   fi
-  echo "All configured Azure Cloud HSM cluster nodes reachable on port ${AZURE_CLOUD_HSM_PORT}" >&2
+  if [ ${#cluster_unreachable[@]} -gt 0 ]; then
+    echo "ERROR: ${#cluster_unreachable[@]} Azure Cloud HSM cluster node(s) unreachable on port ${AZURE_CLOUD_HSM_CLUSTER_PORT}: ${cluster_unreachable[*]}" >&2
+    echo "This is the daemon's inter-node cluster protocol port, distinct from ${AZURE_CLOUD_HSM_PORT}; the daemon will still report itself ready, then every PKCS#11 call fails (e.g. CKR_SLOT_ID_INVALID) because quorum never forms. Widen the VPN route/NSG to cover port ${AZURE_CLOUD_HSM_CLUSTER_PORT} on these private IPs." >&2
+    exit 1
+  fi
+  echo "All configured Azure Cloud HSM cluster nodes reachable on ports ${AZURE_CLOUD_HSM_PORT} and ${AZURE_CLOUD_HSM_CLUSTER_PORT}" >&2
 }
 
 # The PKCS#11 library talks to azcloudhsm_client over a local socket; without
