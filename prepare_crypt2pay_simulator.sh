@@ -3,7 +3,7 @@ set -ex
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-CRYPT2PAY_SIM_INSTANCE="${CRYPT2PAY_SIM_INSTANCE:-1}"
+CRYPT2PAY_SIM_INSTANCE="${CRYPT2PAY_SIM_INSTANCE:-}" # empty: first instance 1..9 whose ports are free
 CRYPT2PAY_SIM_GROUP="${CRYPT2PAY_SIM_GROUP:-bnt}"
 CRYPT2PAY_SIM_GID="${CRYPT2PAY_SIM_GID:-402}"
 CRYPT2PAY_SIM_PID_FILE="${CRYPT2PAY_SIM_PID_FILE:-/tmp/crypt2pay-sim.pid}"
@@ -14,7 +14,24 @@ CRYPT2PAY_SIM_CLIENT_P12_PASSWORD="${CRYPT2PAY_SIM_CLIENT_P12_PASSWORD:-Test2025
 # and the KMS process don't get refused once they overlap.
 CRYPT2PAY_SIM_MAXCON="${CRYPT2PAY_SIM_MAXCON:-8}"
 
-killall -9 bnt || true
+sudo killall -9 bnt || true
+
+# Plain TCP probe: openssl exits non-zero on bnt's TLS port even once it's up.
+port_in_use() { (exec 3<>"/dev/tcp/127.0.0.1/$1") 2>/dev/null; }
+# Instance X: crypto TLS listens on port 3000+X, admin HTTP on 8180+X.
+instance_ports_free() { ! port_in_use $((3000 + $1)) && ! port_in_use $((8180 + $1)); }
+if [[ -z "$CRYPT2PAY_SIM_INSTANCE" ]]; then
+  for n in $(seq 1 9); do
+    if instance_ports_free "$n"; then CRYPT2PAY_SIM_INSTANCE="$n"; break; fi
+  done
+  if [[ -z "$CRYPT2PAY_SIM_INSTANCE" ]]; then
+    echo "no free crypt2pay simulator instance (ports 3001-3009 / 8181-8189 all busy)" >&2
+    exit 1
+  fi
+elif ! instance_ports_free "$CRYPT2PAY_SIM_INSTANCE"; then
+  echo "crypt2pay simulator instance ${CRYPT2PAY_SIM_INSTANCE}: port $((3000 + CRYPT2PAY_SIM_INSTANCE)) or $((8180 + CRYPT2PAY_SIM_INSTANCE)) is already in use" >&2
+  exit 1
+fi
 
 wget -q https://package.cosmian.com/ci/hsm-crypt2pay-simulator.tar.xz
 tar -xJf hsm-crypt2pay-simulator.tar.xz
@@ -31,20 +48,26 @@ fi
 # The simulator refuses to run unless launched by a user in group "c2p"/"bnt", or gid 402.
 getent group "$CRYPT2PAY_SIM_GROUP" >/dev/null 2>&1 || sudo groupadd -g "$CRYPT2PAY_SIM_GID" "$CRYPT2PAY_SIM_GROUP"
 
+# Start from an empty key base: it persists in /tmp/bnt/<n> and fills up ("HSM storage full",
+# CKR_DEVICE_MEMORY) after a few benchmark runs.
+sudo rm -rf "/tmp/bnt/${CRYPT2PAY_SIM_INSTANCE}"
+
 # "-nX" selects instance X: crypto TLS listens on port 3000+X, admin HTTP on 8180+X.
-sudo -g "$CRYPT2PAY_SIM_GROUP" ./crypt2pay-simulator/bnt -n"$CRYPT2PAY_SIM_INSTANCE" &
+# `sudo setsid sg` instead of `sudo -g`: -g needs a (ALL:ALL) sudoers rule, plain (ALL) is rejected.
+# bnt therefore runs as root.
+# `setsid`: on the admin "reboot" bnt signals its process group (SIGINT), which would kill this script.
+CRYPT2PAY_SIM_LOG="$(mktemp)"
+sudo setsid sg "$CRYPT2PAY_SIM_GROUP" -c "exec ./crypt2pay-simulator/bnt -n${CRYPT2PAY_SIM_INSTANCE}" >"$CRYPT2PAY_SIM_LOG" 2>&1 &
 echo $! > "$CRYPT2PAY_SIM_PID_FILE"
 
 CRYPT2PAY_SIM_TLS_PORT=$((3000 + CRYPT2PAY_SIM_INSTANCE))
 CRYPT2PAY_SIM_ADMIN_PORT=$((8180 + CRYPT2PAY_SIM_INSTANCE))
 CRYPT2PAY_SIM_ADMIN_URL="http://127.0.0.1:${CRYPT2PAY_SIM_ADMIN_PORT}"
 
-# Plain TCP check: openssl exits non-zero on bnt's TLS port even once it's up.
 wait_for_port() {
   local port="$1"
-  for i in $(seq 1 30); do
-    if (exec 3<>"/dev/tcp/127.0.0.1/${port}") 2>/dev/null; then
-      exec 3<&- 3>&-
+  for _ in $(seq 1 30); do
+    if port_in_use "$port"; then
       return 0
     fi
     sleep 1
@@ -107,18 +130,27 @@ curl -sf -b "$CRYPT2PAY_SIM_COOKIES" -X POST "${CRYPT2PAY_SIM_ADMIN_URL}/en/appl
   -d "do=yes" -d "part=A" -o /dev/null
 rm -f "$CRYPT2PAY_SIM_COOKIES"
 
+# The pre-reboot process keeps listening until it restarts, and the new one opens its ports
+# before it is fully up: wait for the 2nd "bootstrap completed" banner (1st = initial boot),
+# else clients hit connection refused or crash the C2P library.
+for _ in $(seq 1 60); do
+  [[ "$(grep -c 'C2P bootstrap completed' "$CRYPT2PAY_SIM_LOG")" -ge 2 ]] && break
+  sleep 1
+done
 wait_for_port "$CRYPT2PAY_SIM_TLS_PORT"
 
-# Reuse the real HSM client setup, pointed at the local simulator instance instead of the VPN endpoint.
-CRYPT2PAY_HOST=127.0.0.1 CRYPT2PAY_PORT="$CRYPT2PAY_SIM_TLS_PORT" "$SCRIPT_DIR/prepare_crypt2pay.sh"
+# The client-side object store (/etc/c2p/QuickStart_*_p11) caps at ~4096 objects and survives
+# between runs; objects of a previous simulator instance are stale, and a full store makes
+# every key generation fail with CKR_DEVICE_MEMORY. prepare_crypt2pay.sh restores the dir.
+sudo rm -rf /etc/c2p/QuickStart_*_p11
 
-# prepare_crypt2pay.sh only installs the original CA via its bridge-CA workaround.
-# Without the new CA and the client's own mutual-TLS certificate, every PKCS#11
-# key-generation mechanism is rejected (CKERR_MECHANISM_INVALID) even though the
-# session itself logs in fine.
-sudo cp crypt2pay-simulator/certs/CertificatAC.der /etc/c2p/
-sudo cp crypt2pay-simulator/certs/USER_API-TEST_modern.p12 /etc/c2p/
-(cd /etc/c2p && sudo ./installca -i CertificatAC.der ssl/authorities)
-sudo sed -i "s|<Authorities>\(.*\)</Authorities>|<Authorities>\1</Authorities>\n    <privateKey format=\"pkcs12\" password=\"${CRYPT2PAY_SIM_CLIENT_P12_PASSWORD}\">USER_API-TEST_modern.p12</privateKey>|" /etc/c2p/c2p.xml
+# Reuse the real HSM client setup, pointed at the local simulator instance; the box
+# cert and the client mTLS cert are both issued by KMC-AC_Root. Without the client
+# cert every PKCS#11 key-generation mechanism is rejected (CKERR_MECHANISM_INVALID).
+CRYPT2PAY_HOST=127.0.0.1 CRYPT2PAY_PORT="$CRYPT2PAY_SIM_TLS_PORT" \
+  CRYPT2PAY_EXTRA_CA_DER="$PWD/crypt2pay-simulator/certs/CertificatAC.der" \
+  CRYPT2PAY_CLIENT_P12="$PWD/crypt2pay-simulator/certs/USER_API-TEST_modern.p12" \
+  CRYPT2PAY_CLIENT_P12_PASSWORD="$CRYPT2PAY_SIM_CLIENT_P12_PASSWORD" \
+  "$SCRIPT_DIR/prepare_crypt2pay.sh"
 
 rm -rf crypt2pay-simulator
