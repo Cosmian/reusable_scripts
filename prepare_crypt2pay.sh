@@ -6,10 +6,37 @@ CRYPT2PAY_PORT="${CRYPT2PAY_PORT:-3001}"
 CRYPT2PAY_OPENVPN_PID_FILE="${CRYPT2PAY_OPENVPN_PID_FILE:-/tmp/crypt2pay-openvpn.pid}"
 CRYPT2PAY_OPENVPN_CONF_FILE="${CRYPT2PAY_OPENVPN_CONF_FILE:-/tmp/crypt2pay-openvpn.conf}"
 
+# Validate optional mTLS/extra-CA inputs before anything is downloaded or overwritten.
+if [[ -n "${CRYPT2PAY_EXTRA_CA_DER:-}" && ! -r "$CRYPT2PAY_EXTRA_CA_DER" ]]; then
+  echo "CRYPT2PAY_EXTRA_CA_DER is not a readable file: $CRYPT2PAY_EXTRA_CA_DER" >&2
+  exit 1
+fi
+if [[ -n "${CRYPT2PAY_CLIENT_P12:-}" ]]; then
+  : "${CRYPT2PAY_CLIENT_P12_PASSWORD:?CRYPT2PAY_CLIENT_P12_PASSWORD must be set with CRYPT2PAY_CLIENT_P12}"
+  if [[ ! -r "$CRYPT2PAY_CLIENT_P12" ]]; then
+    echo "CRYPT2PAY_CLIENT_P12 is not a readable file: $CRYPT2PAY_CLIENT_P12" >&2
+    exit 1
+  fi
+  # The password is spliced into a sed replacement and an XML attribute.
+  if [[ "$CRYPT2PAY_CLIENT_P12_PASSWORD" == *[\&\|\\\"\<\>]* ]]; then
+    echo "CRYPT2PAY_CLIENT_P12_PASSWORD must not contain any of: & | \\ \" < >" >&2
+    exit 1
+  fi
+fi
+
 if [[ -n "${OVPN_CONF:-}" ]] && ! timeout 5 openssl s_client -connect "${CRYPT2PAY_HOST}:${CRYPT2PAY_PORT}" </dev/null >/dev/null 2>&1; then
   OPENVPN_BIN="$(command -v openvpn)"
   printf "%s\n" "$OVPN_CONF" > "$CRYPT2PAY_OPENVPN_CONF_FILE"
   sudo "$OPENVPN_BIN" --config "$CRYPT2PAY_OPENVPN_CONF_FILE" --daemon --writepid "$CRYPT2PAY_OPENVPN_PID_FILE"
+  # The daemon returns before the tunnel is up: wait until the HSM answers, or the tests race the VPN.
+  for _ in $(seq 1 60); do
+    (exec 3<>"/dev/tcp/${CRYPT2PAY_HOST}/${CRYPT2PAY_PORT}") 2>/dev/null && break
+    sleep 1
+  done
+  (exec 3<>"/dev/tcp/${CRYPT2PAY_HOST}/${CRYPT2PAY_PORT}") 2>/dev/null || {
+    echo "Crypt2Pay HSM ${CRYPT2PAY_HOST}:${CRYPT2PAY_PORT} unreachable after starting the VPN" >&2
+    exit 1
+  }
 fi
 set -x
 
@@ -125,6 +152,20 @@ cd -
 # be reached through VPN or another forwarded address.
 sudo sed -i "s|<IP>.*</IP>|<IP>${CRYPT2PAY_HOST}</IP>|" /etc/c2p/c2p.xml
 sudo sed -i "s|<Port>.*</Port>|<Port>${CRYPT2PAY_PORT}</Port>|" /etc/c2p/c2p.xml
+
+# Optional: HSM whose TLS cert is signed by another CA (e.g. KMC-AC_Root),
+# and which requires mutual TLS with a PKCS#12 client identity.
+if [[ -n "${CRYPT2PAY_EXTRA_CA_DER:-}" ]]; then
+  sudo cp "$CRYPT2PAY_EXTRA_CA_DER" /etc/c2p/extra_ca.der
+  (cd /etc/c2p && sudo ./installca -i extra_ca.der ssl/authorities && sudo ./installca -l ssl/authorities)
+fi
+if [[ -n "${CRYPT2PAY_CLIENT_P12:-}" ]]; then
+  CRYPT2PAY_CLIENT_P12_NAME="$(basename "$CRYPT2PAY_CLIENT_P12")"
+  sudo cp "$CRYPT2PAY_CLIENT_P12" "/etc/c2p/${CRYPT2PAY_CLIENT_P12_NAME}"
+  # The KMS runs as a non-root user; sudo cp keeps the source's 0600 mode otherwise.
+  sudo chmod 644 "/etc/c2p/${CRYPT2PAY_CLIENT_P12_NAME}"
+  sudo sed -i "s|<Authorities>\(.*\)</Authorities>|<Authorities>\1</Authorities>\n    <privateKey format=\"pkcs12\" password=\"${CRYPT2PAY_CLIENT_P12_PASSWORD}\">${CRYPT2PAY_CLIENT_P12_NAME}</privateKey>|" /etc/c2p/c2p.xml
+fi
 
 # Logging config
 sudo sed -i "s|<TraceLevel>.*</TraceLevel>|<TraceLevel>debug functions parameters pkcs hsm</TraceLevel>|" /etc/c2p/c2p.xml
