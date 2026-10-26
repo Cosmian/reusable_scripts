@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# NOTE: the Cosmian/kms CI job that exercises this script (matrix entry
+# `azure-cloud-hsm` in .github/workflows/test_all.yml, driving
+# .mise/tasks/test/hsm-azure-cloud-hsm) is currently disabled: the Azure Cloud
+# HSM cluster it targets was torn down for cost reasons. This script has not
+# been validated end-to-end since then; re-enable and re-test against a live
+# cluster before relying on it again.
+
 AZURE_CLOUD_HSM_SDK_VERSION="${AZURE_CLOUD_HSM_SDK_VERSION:-2.0.2.5}"
 AZURE_CLOUD_HSM_SDK_DEB_URL="${AZURE_CLOUD_HSM_SDK_DEB_URL:-https://github.com/microsoft/MicrosoftAzureCloudHSM/releases/download/AzureCloudHSM-ClientSDK-${AZURE_CLOUD_HSM_SDK_VERSION}/AzureCloudHSM-ClientSDK-OpenSSL3-${AZURE_CLOUD_HSM_SDK_VERSION}.deb}"
 AZURE_CLOUD_HSM_BIN_DIR="${AZURE_CLOUD_HSM_BIN_DIR:-/opt/azurecloudhsm/bin}"
