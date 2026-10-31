@@ -55,7 +55,10 @@ rm hsm-crypt2pay.tar.gz
 
 sudo install -d -m 700 -o "$(id -u)" -g "$(id -g)" /etc/c2p/
 sudo cp -R c2p/etc/c2p/* /etc/c2p/
-sudo cp c2p/lib/* /lib/
+# `umask 077` must not leave the shared PKCS#11 libraries unreadable to the test user.
+for library in c2p/lib/*; do
+  sudo install -m 0755 "$library" /lib/
+done
 sudo chown -R "$(id -u):$(id -g)" /etc/c2p
 
 rm -rf c2p
@@ -175,6 +178,10 @@ fi
 sudo sed -i "s|<TraceLevel>.*</TraceLevel>|<TraceLevel></TraceLevel>|" /etc/c2p/c2p.xml
 sudo sed -i "s|<TraceFile>.*</TraceFile>|<TraceFile>+/etc/c2p/logs/c2p.trc</TraceFile>|" /etc/c2p/c2p.xml
 
-# The invoking test user needs runtime write access, not every local account.
+# The invoking test user needs runtime write access, not every local account: `/etc/c2p` stays
+# private (0700), while inner files keep read bits so a container running as another UID can use
+# the same configuration once it is copied out (e.g. into a Kubernetes secret).
 sudo chown -R "$(id -u):$(id -g)" /etc/c2p
-sudo chmod -R u=rwX,go= /etc/c2p
+sudo chmod 0700 /etc/c2p
+sudo find /etc/c2p -mindepth 1 -type d -exec chmod 0700 {} +
+sudo find /etc/c2p -mindepth 1 -type f -exec chmod u=rwX,go=r {} +
