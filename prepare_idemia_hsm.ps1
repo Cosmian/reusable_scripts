@@ -28,6 +28,9 @@ param(
     [ValidateSet("NON_FIPS", "FIPS")]
     [string]$SecurityLevel = "NON_FIPS",
     [string]$Pin = "12345678",
+    # INFO logs one line per PKCS#11 call; DEBUG logs every frame (hundreds of MB over a full test run).
+    [ValidateSet("INFO", "DEBUG")]
+    [string]$LogLevel = "INFO",
     [string]$EnvFile = ""
 )
 
@@ -126,8 +129,11 @@ New-Item -ItemType Directory -Force -Path (Join-Path $SimRoot "log") | Out-Null
 Copy-Item -Force -LiteralPath (Join-Path $PackageDir $simDllName) -Destination $SimRoot
 $cfg = Join-Path $SimRoot $simCfgName
 Copy-Item -Force -LiteralPath (Join-Path $PackageDir $simCfgName) -Destination $cfg
-(Get-Content -LiteralPath $cfg) -replace '^\s*SECURITY_LEVEL\s*=.*$', "SECURITY_LEVEL = $SecurityLevel" |
+(Get-Content -LiteralPath $cfg) `
+    -replace '^\s*SECURITY_LEVEL\s*=.*$', "SECURITY_LEVEL = $SecurityLevel" `
+    -replace '^\s*LOG_LEVEL\s*=.*$', "LOG_LEVEL = $LogLevel" |
     Set-Content -Encoding ASCII -LiteralPath $cfg
+Remove-Item -Force -ErrorAction SilentlyContinue -LiteralPath (Join-Path $SimRoot "log\HSM_simulator.log")
 foreach ($expected in @(
         "SECURITY_LEVEL = $SecurityLevel",
         "PKCS11_DLL_PATH = C:\SoftHSMv2\lib\softhsm\libsofthsm2.dll",
