@@ -109,8 +109,8 @@ Set-Content -Encoding ASCII -LiteralPath $softHsmConf -Value @(
 )
 
 # The SoftHSM2 zip does not ship its OpenSSL runtime (libcrypto-3-x64.dll, MSYS2/mingw build).
-# Take it from the package dir if present, else from Git for Windows (mingw64\bin: same build,
-# present on the GitHub windows runners).
+# hsm-idemia-simulator.zip bundles it (the GitHub windows runners' Git for Windows does not have
+# it). Take it from the package dir if present, else from a local Git for Windows (mingw64\bin).
 $libcrypto = "libcrypto-3-x64.dll"
 $softHsmBinDir = Join-Path $SoftHsmRoot "bin"
 if (-not (Test-Path -LiteralPath (Join-Path $softHsmBinDir $libcrypto))) {
