@@ -22,7 +22,9 @@
 #>
 param(
     [string]$PackageDir = $env:IDEMIA_SIM_PACKAGE_DIR,
-    [string]$PackageUrl = $(if ($env:IDEMIA_SIM_PACKAGE_URL) { $env:IDEMIA_SIM_PACKAGE_URL } else { "https://package.cosmian.com/ci/hsm-idemia-simulator.zip" }),
+    # Empty: use hsm-idemia-simulator.zip shipped next to this script (the repository is private,
+    # so the CI checkout is the only authenticated source).
+    [string]$PackageUrl = $env:IDEMIA_SIM_PACKAGE_URL,
     [string]$SimRoot = "C:\Idemia_HSM_Simulator",
     [string]$SoftHsmRoot = "C:\SoftHSMv2",
     [ValidateSet("NON_FIPS", "FIPS")]
@@ -69,9 +71,15 @@ if (-not $PackageDir) {
     $tmp = Join-Path ([System.IO.Path]::GetTempPath()) "idemia-pkg"
     if (Test-Path -LiteralPath $tmp) { Remove-Item -Recurse -Force -LiteralPath $tmp }
     New-Item -ItemType Directory -Force -Path $tmp | Out-Null
-    $zip = Join-Path ([System.IO.Path]::GetTempPath()) "idemia-pkg.zip"
-    Write-Host "Downloading $PackageUrl"
-    Invoke-WebRequest -UseBasicParsing -Uri $PackageUrl -OutFile $zip
+    if ($PackageUrl) {
+        $zip = Join-Path ([System.IO.Path]::GetTempPath()) "idemia-pkg.zip"
+        Write-Host "Downloading $PackageUrl"
+        Invoke-WebRequest -UseBasicParsing -Uri $PackageUrl -OutFile $zip
+    } else {
+        $zip = Join-Path $PSScriptRoot "hsm-idemia-simulator.zip"
+        if (-not (Test-Path -LiteralPath $zip)) { throw "no -PackageDir/-PackageUrl and $zip is missing" }
+        Write-Host "Using $zip"
+    }
     Expand-Archive -Force -LiteralPath $zip -DestinationPath $tmp
     $PackageDir = $tmp
 }
